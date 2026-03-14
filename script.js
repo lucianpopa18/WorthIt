@@ -717,14 +717,32 @@ resetFormBtn.addEventListener('click', () => { resetForm(true); purchaseForm.pro
 // ── Range outputs ─────────────────────────
 function updateAllRangeOutputs() {
   document.querySelectorAll('[data-range-output]').forEach(span => {
-    const input = document.getElementById(span.dataset.rangeOutput);
+    const targetId = span.dataset.rangeOutput;
+    // Try by id first, fallback to sibling input
+    const input = document.getElementById(targetId) ||
+                  span.closest('.slider-card')?.querySelector('input[type="range"]');
     if (input) span.textContent = input.value;
   });
 }
 
-document.querySelectorAll('input[type="range"]').forEach(inp => {
-  inp.addEventListener('input', updateAllRangeOutputs);
-});
+// Attach range listeners — input + change + touchmove for iOS Safari
+function attachRangeListeners() {
+  document.querySelectorAll('input[type="range"]').forEach(inp => {
+    ['input', 'change', 'touchmove'].forEach(evt => {
+      inp.addEventListener(evt, () => {
+        // Update just this slider's output directly
+        const card = inp.closest('.slider-card');
+        if (card) {
+          const out = card.querySelector('.slider-val');
+          if (out) out.textContent = inp.value;
+        }
+        // Also sync all
+        updateAllRangeOutputs();
+      }, { passive: true });
+    });
+  });
+}
+attachRangeListeners();
 
 // ── Wishlist render ───────────────────────
 function renderWishlist() {
@@ -903,23 +921,34 @@ document.getElementById('compareBtn').addEventListener('click', () => {
 });
 
 // ── Tab navigation ────────────────────────
+function switchTab(tabName) {
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  const btn = document.querySelector(`.nav-tab[data-tab="${tabName}"]`);
+  if (btn) btn.classList.add('active');
+  const panel = document.getElementById(`tab-${tabName}`);
+  if (panel) panel.classList.add('active');
+  if (tabName === 'history') refreshHistoryTab();
+}
+
 document.querySelectorAll('.nav-tab').forEach(btn => {
-  btn.addEventListener('click', e => {
+  const handler = e => {
+    e.preventDefault();
     e.stopPropagation();
-    document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    const panel = document.getElementById(`tab-${btn.dataset.tab}`);
-    if (panel) panel.classList.add('active');
-    if (btn.dataset.tab === 'history') refreshHistoryTab();
-  });
+    switchTab(btn.dataset.tab);
+  };
+  btn.addEventListener('click', handler);
+  btn.addEventListener('touchend', handler, { passive: false });
 });
 
 // ── Settings modal ────────────────────────
 function openModal(overlayId) { document.getElementById(overlayId).classList.add('open'); }
 function closeModal(overlayId){ document.getElementById(overlayId).classList.remove('open'); }
 
-document.getElementById('settingsBtn').addEventListener('click', () => openModal('settingsOverlay'));
+const settingsBtn = document.getElementById('settingsBtn');
+const openSettings = e => { e.preventDefault(); openModal('settingsOverlay'); };
+settingsBtn.addEventListener('click', openSettings);
+settingsBtn.addEventListener('touchend', openSettings, { passive: false });
 document.getElementById('settingsClose').addEventListener('click', () => closeModal('settingsOverlay'));
 document.getElementById('settingsOverlay').addEventListener('click', e => {
   if (e.target === document.getElementById('settingsOverlay')) closeModal('settingsOverlay');

@@ -105,14 +105,15 @@ h1, h2, h3, .brand-name, .card-eyebrow, .result-label, .nav-tab, .ov-lbl {
   position: sticky;
   top: 0;
   z-index: 100;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: space-between;
   height: var(--nav-h);
   padding: 0 16px;
   margin: 0 -4px 28px;
   background: rgba(8,11,18,0.88);
   backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
   border-radius: 0 0 var(--radius) var(--radius);
 }
@@ -139,19 +140,17 @@ h1, h2, h3, .brand-name, .card-eyebrow, .result-label, .nav-tab, .ov-lbl {
   filter: drop-shadow(0 0 10px var(--accent-glow));
 }
 
-/* Tabs — pill group, absolutely centered */
+/* Tabs — centered in middle grid column */
 .nav-tabs {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
   gap: 2px;
   align-items: center;
+  justify-content: center;
   background: rgba(255,255,255,0.04);
   border: 1px solid var(--border);
   border-radius: 999px;
   padding: 4px;
-  pointer-events: auto;
+  margin: 0 10px;
 }
 
 [data-theme="light"] .nav-tabs {
@@ -171,6 +170,8 @@ h1, h2, h3, .brand-name, .card-eyebrow, .result-label, .nav-tab, .ov-lbl {
   cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
   transition: color var(--transition), background var(--transition);
   white-space: nowrap;
 }
@@ -199,6 +200,10 @@ h1, h2, h3, .brand-name, .card-eyebrow, .result-label, .nav-tab, .ov-lbl {
   place-items: center;
   cursor: pointer;
   flex-shrink: 0;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
   transition: color var(--transition), background var(--transition), transform 0.3s ease;
 }
 
@@ -212,6 +217,7 @@ h1, h2, h3, .brand-name, .card-eyebrow, .result-label, .nav-tab, .ov-lbl {
 @media (max-width: 520px) {
   .brand-name { display: none; }
   .nav-tab { padding: 7px 11px; font-size: 0.78rem; }
+  .topnav { padding: 0 12px; }
 }
 
 /* ── Tab panels ── */
