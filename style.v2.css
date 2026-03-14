@@ -169,6 +169,8 @@ h1, h2, h3, .brand-name, .card-eyebrow, .result-label, .nav-tab, .ov-lbl {
   padding: 7px 16px;
   border-radius: 999px;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   transition: color var(--transition), background var(--transition);
   white-space: nowrap;
 }

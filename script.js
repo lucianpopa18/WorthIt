@@ -280,13 +280,14 @@ function applyTranslations() {
     el.textContent = t(key);
   });
   // Update all category <select> options — data-i18n doesn't work on <option> natively
-  document.querySelectorAll('select[id="category"], select[name="category"]').forEach(sel => {
+  document.querySelectorAll('#category, select[name="category"]').forEach(sel => {
     const current = sel.value;
     sel.querySelectorAll('option').forEach(opt => {
       const key = 'cat.' + opt.value;
-      opt.textContent = t(key);
+      const translated = t(key);
+      if (translated !== key) opt.textContent = translated;
     });
-    sel.value = current; // restore selection
+    sel.value = current;
   });
 }
 
@@ -645,9 +646,23 @@ function renderResult(result, data) {
   };
 }
 
-purchaseForm.addEventListener('submit', e => {
-  e.preventDefault();
-  if (!purchaseForm.reportValidity()) return;
+document.getElementById('calculateBtn').addEventListener('click', () => {
+  // Manual validation — iOS Safari safe
+  const name  = purchaseForm.productName.value.trim();
+  const price = purchaseForm.price.value;
+  if (!name) {
+    purchaseForm.productName.focus();
+    purchaseForm.productName.style.outline = '2px solid #f05252';
+    return;
+  }
+  purchaseForm.productName.style.outline = '';
+  if (!price || isNaN(Number(price))) {
+    purchaseForm.price.focus();
+    purchaseForm.price.style.outline = '2px solid #f05252';
+    return;
+  }
+  purchaseForm.price.style.outline = '';
+
   const data = getFormData();
   const result = evaluate(data);
 
@@ -888,12 +903,14 @@ document.getElementById('compareBtn').addEventListener('click', () => {
 });
 
 // ── Tab navigation ────────────────────────
-document.querySelectorAll('.nav-tab:not(.nav-tab--settings)').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.nav-tab:not(.nav-tab--settings)').forEach(b => b.classList.remove('active'));
+document.querySelectorAll('.nav-tab').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     btn.classList.add('active');
-    document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+    const panel = document.getElementById(`tab-${btn.dataset.tab}`);
+    if (panel) panel.classList.add('active');
     if (btn.dataset.tab === 'history') refreshHistoryTab();
   });
 });
