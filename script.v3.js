@@ -428,7 +428,7 @@ function getCategoryInsight(category, lang) {
   return (insights[lang] || insights.en)[category] || '';
 }
 
-
+function evaluate(d) {
   const costVsIncomePercent  = d.monthlyIncome > 0 ? (d.price / d.monthlyIncome) * 100 : 100;
   const costVsSavingsPercent = d.savings > 0       ? (d.price / d.savings) * 100        : 100;
   const hoursOfWork          = d.hourlyIncome > 0  ? d.price / d.hourlyIncome           : d.price;
