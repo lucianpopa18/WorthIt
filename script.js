@@ -120,6 +120,20 @@ const TRANSLATIONS = {
     'compare.tie': 'It\'s a tie!',
     'compare.reason': '{nameA} scores {scoreA} vs {nameB} scores {scoreB}. {nameA} offers {diff} more points of value.',
     'compare.tieReason': 'Both products scored equally. Consider price and personal preference.',
+    'form.saveProfile': 'Save financial data for next time',
+    'result.categoryInsight': 'Category insight',
+    'cat.electronics': 'Electronics & Tech',
+    'cat.health': 'Health & Sport',
+    'cat.education': 'Education & Books',
+    'cat.home': 'Home & Living',
+    'cat.transport': 'Transport & Auto',
+    'cat.utilities': 'Services & Utilities',
+    'cat.food': 'Food & Drinks',
+    'cat.groceries': 'Groceries',
+    'cat.clothing': 'Clothing & Fashion',
+    'cat.entertainment': 'Entertainment & Hobby',
+    'cat.travel': 'Travel',
+    'cat.other': 'Other',
   },
   ro: {
     'nav.analyze': 'Analiză',
@@ -233,6 +247,20 @@ const TRANSLATIONS = {
     'compare.tie': 'Egalitate!',
     'compare.reason': '{nameA} obține {scoreA} vs {nameB} obține {scoreB}. {nameA} oferă cu {diff} puncte mai mult.',
     'compare.tieReason': 'Ambele produse au obținut același scor. Ia în considerare prețul și preferința personală.',
+    'form.saveProfile': 'Salvează datele financiare pentru data viitoare',
+    'result.categoryInsight': 'Perspectivă categorie',
+    'cat.electronics': 'Electronică & Tech',
+    'cat.health': 'Sănătate & Sport',
+    'cat.education': 'Educație & Cărți',
+    'cat.home': 'Casă & Locuință',
+    'cat.transport': 'Transport & Auto',
+    'cat.utilities': 'Servicii & Utilități',
+    'cat.food': 'Alimentare & Băuturi',
+    'cat.groceries': 'Groceries',
+    'cat.clothing': 'Îmbrăcăminte & Modă',
+    'cat.entertainment': 'Divertisment & Hobby',
+    'cat.travel': 'Călătorii',
+    'cat.other': 'Altele',
   }
 };
 
@@ -336,7 +364,61 @@ function buildExplanation(result, d) {
   return `${intro} ${prePro} ${preCaution}`;
 }
 
-function evaluate(d) {
+// ── Category system ───────────────────────
+const CATEGORY_DATA = {
+  electronics:   { boost: 0,  key: 'cat.electronics' },
+  health:        { boost: 5,  key: 'cat.health' },
+  education:     { boost: 4,  key: 'cat.education' },
+  home:          { boost: 2,  key: 'cat.home' },
+  transport:     { boost: 1,  key: 'cat.transport' },
+  utilities:     { boost: 2,  key: 'cat.utilities' },
+  food:          { boost: 1,  key: 'cat.food' },
+  groceries:     { boost: 3,  key: 'cat.groceries' },
+  clothing:      { boost: -3, key: 'cat.clothing' },
+  entertainment: { boost: -4, key: 'cat.entertainment' },
+  travel:        { boost: -3, key: 'cat.travel' },
+  other:         { boost: 0,  key: 'cat.other' },
+};
+
+function getCategoryBoost(category) {
+  return CATEGORY_DATA[category]?.boost ?? 0;
+}
+
+function getCategoryInsight(category, lang) {
+  const insights = {
+    en: {
+      electronics:   'Tech gear can be genuinely useful, but also a classic impulse category — make sure it solves a real problem, not just gadget envy.',
+      health:        'Health & fitness investments pay long-term dividends. A body that works well is hard to put a price on.',
+      education:     'Knowledge compounds over time — skills and learning are permanent assets that never depreciate.',
+      home:          'Home improvements affect daily quality of life. Practical and often a solid long-term investment.',
+      transport:     'Transport needs are usually recurring and functional. Consider total cost of ownership, not just purchase price.',
+      utilities:     'Utilities and services are typically necessity-driven — low impulse risk category.',
+      food:          'Food & drink purchases are recurring by nature. Ask yourself if this is a habit or a genuine craving.',
+      groceries:     'Even small grocery decisions add up over time. Worth being mindful of, even for everyday items.',
+      clothing:      'Clothing is one of the highest impulse-purchase categories. Ask: do I need this, or do I just want it right now?',
+      entertainment: 'Entertainment brings joy but is inherently temporary. Make sure it fits your budget before it fits your mood.',
+      travel:        'Experiences are valuable but fleeting — the memories are real, but so is the cost. Time the purchase when finances are stable.',
+      other:         '',
+    },
+    ro: {
+      electronics:   'Gadgeturile pot fi extrem de utile, dar sunt și o categorie clasică de cumpărături impulsive — asigură-te că rezolvă o problemă reală.',
+      health:        'Investițiile în sănătate și sport au randament pe termen lung. Un corp care funcționează bine nu are preț.',
+      education:     'Cunoașterea se acumulează în timp — skill-urile sunt active permanente care nu se depreciază niciodată.',
+      home:          'Îmbunătățirile casei afectează calitatea zilnică a vieții. Practic și adesea o investiție solidă pe termen lung.',
+      transport:     'Nevoile de transport sunt de obicei funcționale și recurente. Gândește-te la costul total, nu doar la prețul de achiziție.',
+      utilities:     'Serviciile și utilitățile sunt de obicei necesare — categorie cu risc impulsiv scăzut.',
+      food:          'Cheltuielile cu mâncarea sunt recurente prin natură. Întreabă-te dacă e un obicei sau o nevoie reală.',
+      groceries:     'Chiar și deciziile mici de grocery se adună în timp. Merită să fii atent, chiar și pentru produse de zi cu zi.',
+      clothing:      'Îmbrăcămintea este una dintre cele mai riscante categorii pentru cumpărături impulsive. Întreabă-te: am nevoie sau vreau acum?',
+      entertainment: 'Divertismentul aduce bucurie dar e temporar prin natura lui. Asigură-te că se încadrează în buget înainte să se încadreze în chef.',
+      travel:        'Experiențele sunt valoroase dar trecătoare — amintirile sunt reale, dar și costul. Cumpără când finanțele sunt stabile.',
+      other:         '',
+    },
+  };
+  return (insights[lang] || insights.en)[category] || '';
+}
+
+
   const costVsIncomePercent  = d.monthlyIncome > 0 ? (d.price / d.monthlyIncome) * 100 : 100;
   const costVsSavingsPercent = d.savings > 0       ? (d.price / d.savings) * 100        : 100;
   const hoursOfWork          = d.hourlyIncome > 0  ? d.price / d.hourlyIncome           : d.price;
@@ -361,14 +443,17 @@ function evaluate(d) {
     if (remaining > 0) goalPenalty = clamp((d.price / remaining) * 18, 0, 18);
   }
 
+  const categoryBoost = getCategoryBoost(d.category);
+
   const base       = necessityPts + frequencyPts + ltvPts + urgencyPts;
   const penalties  = incomePenalty + savingsPenalty + budgetPenalty + altPenalty + daysPenalty + moodPenalty + goalPenalty;
-  const finalScore = Math.round(clamp(base - penalties + 28, 0, 100));
+  const finalScore = Math.round(clamp(base - penalties + 28 + categoryBoost, 0, 100));
 
   const vk = finalScore >= 75 ? 'buy' : finalScore >= 50 ? 'wait' : 'skip';
-  const goalImpactText = getGoalImpact(d);
+  const goalImpactText  = getGoalImpact(d);
+  const categoryInsight = getCategoryInsight(d.category, currentLang);
 
-  const result = { finalScore, verdictKey: vk, impulseRisk, costVsIncomePercent, costVsSavingsPercent, hoursOfWork, goalImpactText };
+  const result = { finalScore, verdictKey: vk, impulseRisk, costVsIncomePercent, costVsSavingsPercent, hoursOfWork, goalImpactText, categoryInsight, category: d.category };
   result.explanation = buildExplanation(result, d);
   return result;
 }
@@ -447,10 +532,15 @@ function getFormData() {
 
 function populateProfileFields() {
   const p = getProfile();
+  // Only auto-fill if user previously opted in to save
+  if (!p._saveEnabled) return;
   ['monthlyIncome','monthlyBudget','savings','hourlyIncome','mainGoalName','mainGoalTarget','mainGoalCurrent'].forEach(k => {
     const el = purchaseForm[k];
     if (el && p[k] !== undefined && p[k] !== null && p[k] !== '') el.value = p[k];
   });
+  // Restore checkbox state
+  const saveCheck = document.getElementById('saveProfileCheck');
+  if (saveCheck) saveCheck.checked = true;
   // Fill compare shared financial fields from profile
   const cmpMap = { monthlyIncome: 'cmpMonthlyIncome', monthlyBudget: 'cmpMonthlyBudget', savings: 'cmpSavings', hourlyIncome: 'cmpHourlyIncome' };
   Object.entries(cmpMap).forEach(([key, id]) => {
@@ -510,6 +600,16 @@ function renderResult(result, data) {
 
   document.getElementById('goalImpactValue').textContent = result.goalImpactText;
 
+  // Category insight
+  const insightBlock = document.getElementById('categoryInsightBlock');
+  const insightText  = document.getElementById('categoryInsightValue');
+  if (result.categoryInsight) {
+    insightText.textContent = result.categoryInsight;
+    insightBlock.classList.remove('hidden');
+  } else {
+    insightBlock.classList.add('hidden');
+  }
+
   // Cooling-off timer only for "wait" verdict
   if (result.verdictKey === 'wait') {
     startCoolingTimer();
@@ -541,12 +641,19 @@ purchaseForm.addEventListener('submit', e => {
   if (!purchaseForm.reportValidity()) return;
   const data = getFormData();
   const result = evaluate(data);
-  writeJSON(SK.profile, {
-    monthlyIncome: data.monthlyIncome, monthlyBudget: data.monthlyBudget,
-    savings: data.savings, hourlyIncome: data.hourlyIncome,
-    mainGoalName: data.mainGoalName, mainGoalTarget: data.mainGoalTarget,
-    mainGoalCurrent: data.mainGoalCurrent,
-  });
+
+  // Save financial profile only if user opted in
+  const saveCheck = document.getElementById('saveProfileCheck');
+  if (saveCheck && saveCheck.checked) {
+    writeJSON(SK.profile, {
+      monthlyIncome: data.monthlyIncome, monthlyBudget: data.monthlyBudget,
+      savings: data.savings, hourlyIncome: data.hourlyIncome,
+      mainGoalName: data.mainGoalName, mainGoalTarget: data.mainGoalTarget,
+      mainGoalCurrent: data.mainGoalCurrent,
+      _saveEnabled: true,
+    });
+  }
+
   renderResult(result, data);
   document.getElementById('resultPanel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 });
@@ -685,6 +792,7 @@ function getCompareFormData(formEl) {
   return {
     productName:        formEl.querySelector('[name="productName"]').value.trim() || '—',
     price:              safeNum(formEl.querySelector('[name="price"]').value),
+    category:           formEl.querySelector('[name="category"]').value || 'other',
     daysWanted:         safeNum(formEl.querySelector('[name="daysWanted"]').value),
     necessityScore:     safeNum(formEl.querySelector('[name="necessityScore"]').value),
     urgencyScore:       safeNum(formEl.querySelector('[name="urgencyScore"]').value),

@@ -120,7 +120,20 @@
             <div class="field-row">
               <div class="field">
                 <label for="category" data-i18n="form.category">Category</label>
-                <input id="category" name="category" type="text" placeholder="e.g. Electronics" />
+                <select id="category" name="category">
+                  <option value="electronics" data-i18n="cat.electronics">Electronică & Tech</option>
+                  <option value="health" data-i18n="cat.health">Sănătate & Sport</option>
+                  <option value="education" data-i18n="cat.education">Educație & Cărți</option>
+                  <option value="home" data-i18n="cat.home">Casă & Locuință</option>
+                  <option value="transport" data-i18n="cat.transport">Transport & Auto</option>
+                  <option value="utilities" data-i18n="cat.utilities">Servicii & Utilități</option>
+                  <option value="food" data-i18n="cat.food">Alimentare & Băuturi</option>
+                  <option value="groceries" data-i18n="cat.groceries">Groceries</option>
+                  <option value="clothing" data-i18n="cat.clothing">Îmbrăcăminte & Modă</option>
+                  <option value="entertainment" data-i18n="cat.entertainment">Divertisment & Hobby</option>
+                  <option value="travel" data-i18n="cat.travel">Călătorii</option>
+                  <option value="other" data-i18n="cat.other">Altele</option>
+                </select>
               </div>
               <div class="field">
                 <label for="mood" data-i18n="form.mood">Current mood</label>
@@ -233,6 +246,12 @@
               <input id="mainGoalCurrent" name="mainGoalCurrent" type="number" min="0" step="0.01" placeholder="0" />
             </div>
 
+            <label class="save-profile-label" for="saveProfileCheck">
+              <input type="checkbox" id="saveProfileCheck" />
+              <span class="save-profile-icon">💾</span>
+              <span data-i18n="form.saveProfile">Save financial data for next time</span>
+            </label>
+
             <div class="form-actions">
               <button type="submit" class="btn btn-primary" data-i18n="form.submit">Calculate verdict</button>
               <button type="button" class="btn btn-ghost" id="resetFormBtn" data-i18n="form.reset">Reset</button>
@@ -307,6 +326,12 @@
               <p class="result-text" id="goalImpactValue">—</p>
             </div>
 
+            <!-- Category insight -->
+            <div class="result-category-insight hidden" id="categoryInsightBlock">
+              <span class="result-label" data-i18n="result.categoryInsight">Category insight</span>
+              <p class="result-text" id="categoryInsightValue"></p>
+            </div>
+
             <!-- Cooling off timer (shown when verdict=wait) -->
             <div class="cooling-block hidden" id="coolingBlock">
               <span class="result-label" data-i18n="result.cooling">Cooling-off period</span>
@@ -362,6 +387,23 @@
               <input name="price" type="number" min="0" step="0.01" placeholder="0" required />
             </div>
             <div class="field" style="margin-top:12px">
+              <label data-i18n="form.category">Category</label>
+              <select name="category">
+                <option value="electronics" data-i18n="cat.electronics">Electronică & Tech</option>
+                <option value="health" data-i18n="cat.health">Sănătate & Sport</option>
+                <option value="education" data-i18n="cat.education">Educație & Cărți</option>
+                <option value="home" data-i18n="cat.home">Casă & Locuință</option>
+                <option value="transport" data-i18n="cat.transport">Transport & Auto</option>
+                <option value="utilities" data-i18n="cat.utilities">Servicii & Utilități</option>
+                <option value="food" data-i18n="cat.food">Alimentare & Băuturi</option>
+                <option value="groceries" data-i18n="cat.groceries">Groceries</option>
+                <option value="clothing" data-i18n="cat.clothing">Îmbrăcăminte & Modă</option>
+                <option value="entertainment" data-i18n="cat.entertainment">Divertisment & Hobby</option>
+                <option value="travel" data-i18n="cat.travel">Călătorii</option>
+                <option value="other" data-i18n="cat.other">Altele</option>
+              </select>
+            </div>
+            <div class="field" style="margin-top:12px">
               <label data-i18n="form.days">Days you've wanted it</label>
               <input name="daysWanted" type="number" min="0" step="1" value="3" />
             </div>
@@ -407,6 +449,23 @@
             <div class="field" style="margin-top:12px">
               <label data-i18n="form.price">Price (EUR)</label>
               <input name="price" type="number" min="0" step="0.01" placeholder="0" required />
+            </div>
+            <div class="field" style="margin-top:12px">
+              <label data-i18n="form.category">Category</label>
+              <select name="category">
+                <option value="electronics" data-i18n="cat.electronics">Electronică & Tech</option>
+                <option value="health" data-i18n="cat.health">Sănătate & Sport</option>
+                <option value="education" data-i18n="cat.education">Educație & Cărți</option>
+                <option value="home" data-i18n="cat.home">Casă & Locuință</option>
+                <option value="transport" data-i18n="cat.transport">Transport & Auto</option>
+                <option value="utilities" data-i18n="cat.utilities">Servicii & Utilități</option>
+                <option value="food" data-i18n="cat.food">Alimentare & Băuturi</option>
+                <option value="groceries" data-i18n="cat.groceries">Groceries</option>
+                <option value="clothing" data-i18n="cat.clothing">Îmbrăcăminte & Modă</option>
+                <option value="entertainment" data-i18n="cat.entertainment">Divertisment & Hobby</option>
+                <option value="travel" data-i18n="cat.travel">Călătorii</option>
+                <option value="other" data-i18n="cat.other">Altele</option>
+              </select>
             </div>
             <div class="field" style="margin-top:12px">
               <label data-i18n="form.days">Days you've wanted it</label>
