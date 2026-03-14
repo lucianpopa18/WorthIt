@@ -190,33 +190,31 @@ h1, h2, h3, .brand-name, .card-eyebrow, .result-label, .nav-tab, .ov-lbl {
   display: flex;
   align-items: center;
   gap: 0;
-  padding: 20px 28px;
+  padding: 24px 28px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   margin-bottom: 24px;
   backdrop-filter: blur(12px);
-  overflow: visible;
 }
 
 .hero-stat {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  gap: 6px;
   flex: 1;
   text-align: center;
+  padding: 4px 12px;
 }
 
 .hero-stat-val {
   font-family: 'Syne', sans-serif;
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.2;
-  min-height: 1.8rem;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
   display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -377,15 +375,15 @@ textarea { resize: vertical; min-height: 90px; }
 .sliders-grid--2 { margin-bottom: 0; }
 
 .slider-card {
-  padding: 14px 16px;
+  padding: 14px 16px 16px;
   background: rgba(255,255,255,0.03);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  overflow: visible;
-  position: relative;
+  gap: 10px;
+  /* clip the thumb shadow but not the thumb itself */
+  overflow: hidden;
 }
 
 .slider-top {
@@ -402,36 +400,49 @@ textarea { resize: vertical; min-height: 90px; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 32px;
-  height: 28px;
+  min-width: 30px;
+  height: 26px;
   border-radius: 999px;
   background: var(--accent-glow);
   color: var(--accent-2);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 800;
+  flex-shrink: 0;
 }
 
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
-  width: 100%;
-  height: 4px;
+  width: calc(100% + 0px);
+  height: 6px;
   border-radius: 999px;
   background: var(--border-strong);
   outline: none;
   padding: 0;
+  margin: 4px 0 2px;
   cursor: pointer;
+  display: block;
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 0 4px var(--accent-glow), 0 2px 8px rgba(0,0,0,0.4);
+  box-shadow: 0 0 0 3px var(--bg2), 0 0 0 5px var(--accent-glow);
   transition: transform 0.15s ease;
+  cursor: pointer;
 }
-input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 3px solid var(--bg2);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+  cursor: pointer;
+}
 
 .slider-hint {
   font-size: 0.74rem;
@@ -926,22 +937,24 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 .ov-card {
   flex: 1;
   min-width: 100px;
-  padding: 18px 16px;
+  padding: 22px 16px 18px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  gap: 8px;
   text-align: center;
 }
 
 .ov-val {
   font-family: 'Syne', sans-serif;
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  display: block;
 }
 .ov-val.accent { color: var(--accent); }
 .ov-lbl { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); }
@@ -1138,7 +1151,8 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
   .field-row { grid-template-columns: 1fr; }
   .sliders-grid { grid-template-columns: 1fr; }
   .hero-bar { padding: 14px 18px; }
-  .hero-stat-val { font-size: 1.3rem; }
+  .hero-stat-val { font-size: 1.4rem; }
+  .ov-val { font-size: 1.4rem; }
   .score-section { flex-direction: column; align-items: flex-start; }
   .overview-row { gap: 8px; }
   .ov-card { min-width: 80px; }
