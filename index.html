@@ -1,431 +1,571 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WorthIt — Purchase Decision Helper</title>
-  <meta
-    name="description"
-    content="WorthIt helps you decide whether a product is worth buying based on financial and behavioral context."
-  />
+  <title>WorthIt — Purchase Decision Engine</title>
+  <meta name="description" content="Slow down impulsive spending. Get a clear, data-driven verdict before you buy." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="page-shell">
-    <header class="hero section">
-      <div class="hero-card panel glass">
-        <span class="eyebrow">Purchase Decision Helper</span>
-        <h1>WorthIt</h1>
-        <p class="hero-subtitle">
-          Slow down impulsive spending and get a clear recommendation based on need,
-          timing, financial impact and behavioral signals.
-        </p>
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="#analyzer">Analyze a purchase</a>
-          <a class="btn btn-secondary" href="#dashboard">View dashboard</a>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsOverlay">
+  <div class="modal-box" id="settingsModal" role="dialog" aria-modal="true" aria-label="Settings">
+    <div class="modal-header">
+      <h3 data-i18n="settings.title">Settings</h3>
+      <button class="modal-close" id="settingsClose" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="settings-section">
+        <p class="settings-label" data-i18n="settings.language">Language / Limbă</p>
+        <div class="toggle-group">
+          <button class="toggle-btn active" data-lang="en">English</button>
+          <button class="toggle-btn" data-lang="ro">Română</button>
         </div>
       </div>
-
-      <div class="hero-side panel glass">
-        <div class="hero-side-row">
-          <span class="dot"></span>
-          <span>Deterministic logic · Local-first · No backend</span>
+      <div class="settings-section">
+        <p class="settings-label" data-i18n="settings.theme">Theme</p>
+        <div class="toggle-group">
+          <button class="toggle-btn active" data-theme="dark" data-i18n="settings.dark">Dark</button>
+          <button class="toggle-btn" data-theme="light" data-i18n="settings.light">Light</button>
         </div>
-        <div class="hero-stats">
-          <div>
-            <strong id="heroDecisions">0</strong>
-            <span>saved analyses</span>
-          </div>
-          <div>
-            <strong id="heroAvoided">€0.00</strong>
-            <span>money avoided</span>
-          </div>
-        </div>
-        <p class="hero-note">
-          Everything runs directly in the browser and uses localStorage for persistence.
-        </p>
       </div>
-    </header>
-
-    <main>
-      <section id="dashboard" class="section">
-        <div class="section-heading">
-          <div>
-            <span class="eyebrow">Dashboard</span>
-            <h2>Quick overview</h2>
-          </div>
-        </div>
-
-        <div class="overview-grid">
-          <article class="stat-card panel">
-            <span class="stat-label">Total analyses</span>
-            <strong class="stat-value" id="totalDecisionsCard">0</strong>
-          </article>
-          <article class="stat-card panel">
-            <span class="stat-label">Approved purchases</span>
-            <strong class="stat-value" id="acceptedCard">0</strong>
-          </article>
-          <article class="stat-card panel">
-            <span class="stat-label">Postponed purchases</span>
-            <strong class="stat-value" id="postponedCard">0</strong>
-          </article>
-          <article class="stat-card panel">
-            <span class="stat-label">Rejected purchases</span>
-            <strong class="stat-value" id="rejectedCard">0</strong>
-          </article>
-          <article class="stat-card panel highlight">
-            <span class="stat-label">Money avoided</span>
-            <strong class="stat-value" id="avoidedMoneyCard">€0.00</strong>
-          </article>
-        </div>
-
-        <div class="dashboard-grid">
-          <section class="panel list-panel">
-            <div class="panel-header">
-              <div>
-                <h3>Latest decisions</h3>
-                <p>Most recent purchase analyses</p>
-              </div>
-            </div>
-            <div id="historyList" class="list-stack"></div>
-          </section>
-
-          <section class="panel list-panel">
-            <div class="panel-header">
-              <div>
-                <h3>Wishlist</h3>
-                <p>Saved products for later</p>
-              </div>
-            </div>
-            <div id="wishlistList" class="list-stack"></div>
-          </section>
-        </div>
-      </section>
-
-      <section id="insights" class="section">
-        <div class="section-heading">
-          <div>
-            <span class="eyebrow">Insights</span>
-            <h2>What your decisions say</h2>
-          </div>
-          <button type="button" class="btn btn-danger" id="resetDataBtn">Reset saved data</button>
-        </div>
-
-        <div class="insights-grid">
-          <article class="panel insight-summary">
-            <div class="insight-row">
-              <span>Total decisions</span>
-              <strong id="insightTotal">0</strong>
-            </div>
-            <div class="insight-row">
-              <span>Accepted</span>
-              <strong id="insightAccepted">0</strong>
-            </div>
-            <div class="insight-row">
-              <span>Postponed</span>
-              <strong id="insightPostponed">0</strong>
-            </div>
-            <div class="insight-row">
-              <span>Rejected</span>
-              <strong id="insightRejected">0</strong>
-            </div>
-            <div class="insight-row">
-              <span>Estimated money avoided</span>
-              <strong id="insightAvoided">€0.00</strong>
-            </div>
-            <div class="insight-row">
-              <span>Most rejected category</span>
-              <strong id="topRejectedCategory">—</strong>
-            </div>
-          </article>
-
-          <article class="panel bars-panel">
-            <div class="panel-header compact">
-              <div>
-                <h3>Verdict distribution</h3>
-                <p>Simple view across all saved analyses</p>
-              </div>
-            </div>
-
-            <div class="bar-group">
-              <div class="bar-meta">
-                <span>Buy</span>
-                <strong id="buyBarValue">0%</strong>
-              </div>
-              <div class="bar-track"><span id="buyBarFill" class="bar-fill positive"></span></div>
-            </div>
-
-            <div class="bar-group">
-              <div class="bar-meta">
-                <span>Wait</span>
-                <strong id="waitBarValue">0%</strong>
-              </div>
-              <div class="bar-track"><span id="waitBarFill" class="bar-fill warning"></span></div>
-            </div>
-
-            <div class="bar-group">
-              <div class="bar-meta">
-                <span>Do not buy now</span>
-                <strong id="skipBarValue">0%</strong>
-              </div>
-              <div class="bar-track"><span id="skipBarFill" class="bar-fill danger"></span></div>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section id="analyzer" class="section">
-        <div class="section-heading">
-          <div>
-            <span class="eyebrow">Analysis</span>
-            <h2>Analyze a purchase</h2>
-          </div>
-        </div>
-
-        <div class="analyzer-grid">
-          <section class="panel form-panel">
-            <form id="purchaseForm" class="purchase-form" novalidate>
-              <div class="form-grid two-columns">
-                <div class="field-group">
-                  <label for="productName">Product name</label>
-                  <input id="productName" name="productName" type="text" placeholder="e.g. Noise-cancelling headphones" required />
-                </div>
-
-                <div class="field-group">
-                  <label for="price">Price (EUR)</label>
-                  <input id="price" name="price" type="number" min="0" step="0.01" placeholder="0" required />
-                </div>
-
-                <div class="field-group">
-                  <label for="category">Category</label>
-                  <select id="category" name="category" required>
-                    <option value="">Select</option>
-                    <option value="Electronics">Electronics</option>
-                    <option value="Home">Home</option>
-                    <option value="Clothing">Clothing</option>
-                    <option value="Education">Education</option>
-                    <option value="Health">Health</option>
-                    <option value="Hobby">Hobby</option>
-                    <option value="Travel">Travel</option>
-                    <option value="Gifts">Gifts</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-
-                <div class="field-group field-group-full">
-                  <label for="reason">Why do you want to buy it?</label>
-                  <textarea id="reason" name="reason" rows="4" placeholder="Write the main reason"></textarea>
-                </div>
-              </div>
-
-              <div class="form-section-title">
-                <h3>Behavioral scores</h3>
-                <p>1 = very low, 10 = very high</p>
-              </div>
-
-              <div class="sliders-grid">
-                <div class="field-group range-group">
-                  <div class="range-label-row">
-                    <label for="necessityScore">Necessity</label>
-                    <span class="range-value" data-range-output="necessityScore">5</span>
-                  </div>
-                  <input id="necessityScore" name="necessityScore" type="range" min="1" max="10" value="5" />
-                  <small>How necessary is it?</small>
-                </div>
-
-                <div class="field-group range-group">
-                  <div class="range-label-row">
-                    <label for="urgencyScore">Urgency</label>
-                    <span class="range-value" data-range-output="urgencyScore">5</span>
-                  </div>
-                  <input id="urgencyScore" name="urgencyScore" type="range" min="1" max="10" value="5" />
-                  <small>How urgent is it right now?</small>
-                </div>
-
-                <div class="field-group range-group">
-                  <div class="range-label-row">
-                    <label for="frequencyScore">Frequency</label>
-                    <span class="range-value" data-range-output="frequencyScore">5</span>
-                  </div>
-                  <input id="frequencyScore" name="frequencyScore" type="range" min="1" max="10" value="5" />
-                  <small>How often will you use it?</small>
-                </div>
-
-                <div class="field-group range-group">
-                  <div class="range-label-row">
-                    <label for="longTermValueScore">Long-term value</label>
-                    <span class="range-value" data-range-output="longTermValueScore">5</span>
-                  </div>
-                  <input id="longTermValueScore" name="longTermValueScore" type="range" min="1" max="10" value="5" />
-                  <small>How much value does it bring over time?</small>
-                </div>
-              </div>
-
-              <div class="form-grid three-columns">
-                <div class="field-group checkbox-card">
-                  <label class="checkbox-label" for="hasAlternative">
-                    <input id="hasAlternative" name="hasAlternative" type="checkbox" />
-                    <span>I already have a reasonable alternative</span>
-                  </label>
-                </div>
-
-                <div class="field-group">
-                  <label for="daysWanted">How many days have you wanted it?</label>
-                  <input id="daysWanted" name="daysWanted" type="number" min="0" step="1" value="3" required />
-                </div>
-
-                <div class="field-group">
-                  <label for="mood">Current mood</label>
-                  <select id="mood" name="mood">
-                    <option value="neutral">Neutral</option>
-                    <option value="calm">Calm</option>
-                    <option value="stressed">Stressed</option>
-                    <option value="bored">Bored</option>
-                    <option value="excited">Excited</option>
-                    <option value="sad">Sad</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="form-section-title">
-                <h3>Financial context</h3>
-                <p>These values are saved locally in your browser for convenience.</p>
-              </div>
-
-              <div class="form-grid two-columns">
-                <div class="field-group">
-                  <label for="monthlyIncome">Monthly income (EUR)</label>
-                  <input id="monthlyIncome" name="monthlyIncome" type="number" min="0" step="0.01" placeholder="0" required />
-                </div>
-
-                <div class="field-group">
-                  <label for="monthlyBudget">Available monthly budget (EUR)</label>
-                  <input id="monthlyBudget" name="monthlyBudget" type="number" min="0" step="0.01" placeholder="0" required />
-                </div>
-
-                <div class="field-group">
-                  <label for="savings">Savings (EUR)</label>
-                  <input id="savings" name="savings" type="number" min="0" step="0.01" placeholder="0" required />
-                </div>
-
-                <div class="field-group">
-                  <label for="hourlyIncome">Hourly income (EUR)</label>
-                  <input id="hourlyIncome" name="hourlyIncome" type="number" min="0" step="0.01" placeholder="0" required />
-                </div>
-
-                <div class="field-group">
-                  <label for="mainGoalName">Main financial goal</label>
-                  <input id="mainGoalName" name="mainGoalName" type="text" placeholder="e.g. Emergency fund" />
-                </div>
-
-                <div class="field-group">
-                  <label for="mainGoalTarget">Goal target (EUR)</label>
-                  <input id="mainGoalTarget" name="mainGoalTarget" type="number" min="0" step="0.01" placeholder="0" />
-                </div>
-
-                <div class="field-group field-group-full">
-                  <label for="mainGoalCurrent">Current goal progress (optional, EUR)</label>
-                  <input id="mainGoalCurrent" name="mainGoalCurrent" type="number" min="0" step="0.01" placeholder="0" />
-                </div>
-              </div>
-
-              <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Calculate verdict</button>
-                <button type="button" class="btn btn-secondary" id="resetFormBtn">Reset form</button>
-              </div>
-            </form>
-          </section>
-
-          <section class="panel result-panel" id="resultPanel">
-            <div class="result-empty" id="resultEmptyState">
-              <span class="result-empty-icon">⏳</span>
-              <h3>Your analysis result appears here</h3>
-              <p>
-                Fill in the form and you will get a final score, a clear verdict and a summary
-                of the financial impact.
-              </p>
-            </div>
-
-            <div class="result-content hidden" id="resultContent">
-              <div class="score-ring-wrap">
-                <div class="score-ring" id="scoreRing"><span id="finalScoreValue">0</span></div>
-                <div class="score-copy">
-                  <span class="result-label">Final score</span>
-                  <h3 id="verdictText">Wait</h3>
-                  <span class="verdict-pill" id="verdictPill">Wait</span>
-                </div>
-              </div>
-
-              <div class="result-block">
-                <span class="result-label">Explanation</span>
-                <p id="explanationText"></p>
-              </div>
-
-              <div class="result-grid">
-                <div class="result-card soft-card">
-                  <span class="result-label">% of monthly income</span>
-                  <strong id="incomePercentValue">0%</strong>
-                </div>
-                <div class="result-card soft-card">
-                  <span class="result-label">% of savings</span>
-                  <strong id="savingsPercentValue">0%</strong>
-                </div>
-                <div class="result-card soft-card">
-                  <span class="result-label">Hours of work needed</span>
-                  <strong id="hoursOfWorkValue">0h</strong>
-                </div>
-                <div class="result-card soft-card">
-                  <span class="result-label">Impulse risk</span>
-                  <strong id="impulseRiskValue">Low</strong>
-                </div>
-              </div>
-
-              <div class="result-block soft-card">
-                <span class="result-label">Impact on your goal</span>
-                <p id="goalImpactValue">No goal set.</p>
-              </div>
-
-              <div class="result-actions">
-                <button class="btn btn-secondary" type="button" id="wishlistBtn">Add to wishlist</button>
-                <button class="btn btn-ghost" type="button" id="analyzeAnotherBtn">Analyze another product</button>
-              </div>
-            </div>
-          </section>
-        </div>
-      </section>
-    </main>
+      <div class="settings-section">
+        <p class="settings-label" data-i18n="settings.reset">Danger zone</p>
+        <button class="btn btn-danger-full" id="resetDataBtn" data-i18n="settings.resetBtn">Reset all saved data</button>
+      </div>
+    </div>
   </div>
+</div>
 
-  <template id="historyItemTemplate">
-    <article class="list-item">
-      <div>
-        <div class="list-item-top">
-          <h4 class="list-title"></h4>
-          <span class="badge verdict-badge"></span>
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirmOverlay">
+  <div class="modal-box modal-box--sm" id="confirmModal" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <h3 data-i18n="confirm.title">Are you sure?</h3>
+    </div>
+    <div class="modal-body">
+      <p data-i18n="confirm.body">This will permanently delete all saved decisions, wishlist and profile data.</p>
+      <div class="confirm-actions">
+        <button class="btn btn-danger-full" id="confirmYes" data-i18n="confirm.yes">Yes, delete everything</button>
+        <button class="btn btn-ghost-full" id="confirmNo" data-i18n="confirm.no">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="app-shell">
+
+  <!-- NAV -->
+  <nav class="topnav">
+    <div class="nav-brand">
+      <span class="brand-icon">◈</span>
+      <span class="brand-name">WorthIt</span>
+    </div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-tab="analyzer" data-i18n="nav.analyze">Analyze</button>
+      <button class="nav-tab" data-tab="compare" data-i18n="nav.compare">Compare</button>
+      <button class="nav-tab" data-tab="history" data-i18n="nav.history">History</button>
+    </div>
+    <button class="nav-settings" id="settingsBtn" aria-label="Settings">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 1 0 4.93 19.07"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    </button>
+  </nav>
+
+  <!-- ═══ TAB: ANALYZER ═══ -->
+  <section class="tab-panel active" id="tab-analyzer">
+
+    <!-- Hero stats bar -->
+    <div class="hero-bar">
+      <div class="hero-stat">
+        <span class="hero-stat-val" id="heroDecisions">0</span>
+        <span class="hero-stat-lbl" data-i18n="hero.analyses">analyses</span>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat">
+        <span class="hero-stat-val accent" id="heroAvoided">€0</span>
+        <span class="hero-stat-lbl" data-i18n="hero.avoided">money avoided</span>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat">
+        <span class="hero-stat-val" id="heroBuyRate">—</span>
+        <span class="hero-stat-lbl" data-i18n="hero.buyRate">buy rate</span>
+      </div>
+    </div>
+
+    <div class="analyzer-layout">
+
+      <!-- FORM -->
+      <div class="form-col">
+        <div class="card">
+          <div class="card-eyebrow" data-i18n="form.eyebrow">Purchase Details</div>
+
+          <form id="purchaseForm" novalidate>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="productName" data-i18n="form.name">Product name</label>
+                <input id="productName" name="productName" type="text" placeholder="e.g. Sony WH-1000XM5" required />
+              </div>
+              <div class="field field--sm">
+                <label for="price" data-i18n="form.price">Price (EUR)</label>
+                <input id="price" name="price" type="number" min="0" step="0.01" placeholder="0" required />
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="category" data-i18n="form.category">Category</label>
+                <input id="category" name="category" type="text" placeholder="e.g. Electronics" />
+              </div>
+              <div class="field">
+                <label for="mood" data-i18n="form.mood">Current mood</label>
+                <select id="mood" name="mood">
+                  <option value="neutral" data-i18n="mood.neutral">Neutral</option>
+                  <option value="calm" data-i18n="mood.calm">Calm</option>
+                  <option value="stressed" data-i18n="mood.stressed">Stressed</option>
+                  <option value="bored" data-i18n="mood.bored">Bored</option>
+                  <option value="excited" data-i18n="mood.excited">Excited</option>
+                  <option value="sad" data-i18n="mood.sad">Sad</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="reason" data-i18n="form.reason">Why do you want it?</label>
+              <textarea id="reason" name="reason" placeholder="Describe why you need this..."></textarea>
+            </div>
+
+            <!-- SLIDERS -->
+            <div class="sliders-grid">
+              <div class="slider-card">
+                <div class="slider-top">
+                  <span data-i18n="slider.necessity">Necessity</span>
+                  <span class="slider-val" data-range-output="necessityScore">5</span>
+                </div>
+                <input id="necessityScore" name="necessityScore" type="range" min="1" max="10" value="5" />
+                <span class="slider-hint" data-i18n="slider.necessityHint">How much do you actually need it?</span>
+              </div>
+              <div class="slider-card">
+                <div class="slider-top">
+                  <span data-i18n="slider.urgency">Urgency</span>
+                  <span class="slider-val" data-range-output="urgencyScore">5</span>
+                </div>
+                <input id="urgencyScore" name="urgencyScore" type="range" min="1" max="10" value="5" />
+                <span class="slider-hint" data-i18n="slider.urgencyHint">How urgent is it right now?</span>
+              </div>
+              <div class="slider-card">
+                <div class="slider-top">
+                  <span data-i18n="slider.frequency">Frequency</span>
+                  <span class="slider-val" data-range-output="frequencyScore">5</span>
+                </div>
+                <input id="frequencyScore" name="frequencyScore" type="range" min="1" max="10" value="5" />
+                <span class="slider-hint" data-i18n="slider.frequencyHint">How often will you use it?</span>
+              </div>
+              <div class="slider-card">
+                <div class="slider-top">
+                  <span data-i18n="slider.longterm">Long-term value</span>
+                  <span class="slider-val" data-range-output="longTermValueScore">5</span>
+                </div>
+                <input id="longTermValueScore" name="longTermValueScore" type="range" min="1" max="10" value="5" />
+                <span class="slider-hint" data-i18n="slider.longtermHint">Value over time?</span>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="daysWanted" data-i18n="form.days">Days you've wanted it</label>
+                <input id="daysWanted" name="daysWanted" type="number" min="0" step="1" value="3" required />
+              </div>
+              <div class="field field--checkbox">
+                <label class="checkbox-label" for="hasAlternative">
+                  <input id="hasAlternative" name="hasAlternative" type="checkbox" />
+                  <span data-i18n="form.alternative">I already have a reasonable alternative</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- FINANCIAL CONTEXT -->
+            <div class="section-divider">
+              <span data-i18n="form.financial">Financial Context</span>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="monthlyIncome" data-i18n="form.income">Monthly income (EUR)</label>
+                <input id="monthlyIncome" name="monthlyIncome" type="number" min="0" step="0.01" placeholder="0" required />
+              </div>
+              <div class="field">
+                <label for="monthlyBudget" data-i18n="form.budget">Available budget (EUR)</label>
+                <input id="monthlyBudget" name="monthlyBudget" type="number" min="0" step="0.01" placeholder="0" required />
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="savings" data-i18n="form.savings">Savings (EUR)</label>
+                <input id="savings" name="savings" type="number" min="0" step="0.01" placeholder="0" required />
+              </div>
+              <div class="field">
+                <label for="hourlyIncome" data-i18n="form.hourly">Hourly income (EUR)</label>
+                <input id="hourlyIncome" name="hourlyIncome" type="number" min="0" step="0.01" placeholder="0" required />
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="mainGoalName" data-i18n="form.goalName">Financial goal</label>
+                <input id="mainGoalName" name="mainGoalName" type="text" placeholder="e.g. Emergency fund" />
+              </div>
+              <div class="field">
+                <label for="mainGoalTarget" data-i18n="form.goalTarget">Goal target (EUR)</label>
+                <input id="mainGoalTarget" name="mainGoalTarget" type="number" min="0" step="0.01" placeholder="0" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="mainGoalCurrent" data-i18n="form.goalCurrent">Goal progress (EUR)</label>
+              <input id="mainGoalCurrent" name="mainGoalCurrent" type="number" min="0" step="0.01" placeholder="0" />
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" data-i18n="form.submit">Calculate verdict</button>
+              <button type="button" class="btn btn-ghost" id="resetFormBtn" data-i18n="form.reset">Reset</button>
+            </div>
+
+          </form>
         </div>
-        <p class="list-meta"></p>
-        <p class="list-copy"></p>
       </div>
-    </article>
-  </template>
 
-  <template id="wishlistItemTemplate">
-    <article class="list-item wishlist-item">
-      <div>
-        <div class="list-item-top">
-          <h4 class="list-title"></h4>
-          <span class="badge status-badge"></span>
+      <!-- RESULT -->
+      <div class="result-col">
+        <div class="card result-card" id="resultPanel">
+
+          <!-- Empty state -->
+          <div class="result-empty" id="resultEmpty">
+            <div class="result-empty-orb"></div>
+            <p class="result-empty-title" data-i18n="result.emptyTitle">Awaiting analysis</p>
+            <p class="result-empty-sub" data-i18n="result.emptySub">Fill in the form to get your verdict</p>
+          </div>
+
+          <!-- Result content -->
+          <div class="result-content hidden" id="resultContent">
+
+            <!-- Score -->
+            <div class="score-section">
+              <div class="score-ring-outer">
+                <svg class="score-svg" viewBox="0 0 120 120" id="scoreSvg">
+                  <circle class="score-track" cx="60" cy="60" r="52" />
+                  <circle class="score-fill" cx="60" cy="60" r="52" id="scoreArc" />
+                </svg>
+                <div class="score-center">
+                  <span class="score-num" id="finalScoreValue">0</span>
+                  <span class="score-max">/100</span>
+                </div>
+              </div>
+              <div class="score-meta">
+                <span class="result-label" data-i18n="result.score">Score</span>
+                <div class="verdict-chip" id="verdictChip">—</div>
+                <p class="verdict-sub" id="verdictSub"></p>
+              </div>
+            </div>
+
+            <!-- Explanation -->
+            <div class="result-section">
+              <span class="result-label" data-i18n="result.explanation">Analysis</span>
+              <p class="result-text" id="explanationText"></p>
+            </div>
+
+            <!-- Stats grid -->
+            <div class="result-stats">
+              <div class="result-stat">
+                <span class="result-stat-lbl" data-i18n="result.income">% of income</span>
+                <span class="result-stat-val" id="incomePercentValue">—</span>
+              </div>
+              <div class="result-stat">
+                <span class="result-stat-lbl" data-i18n="result.savings">% of savings</span>
+                <span class="result-stat-val" id="savingsPercentValue">—</span>
+              </div>
+              <div class="result-stat">
+                <span class="result-stat-lbl" data-i18n="result.hours">Hours of work</span>
+                <span class="result-stat-val" id="hoursOfWorkValue">—</span>
+              </div>
+              <div class="result-stat">
+                <span class="result-stat-lbl" data-i18n="result.impulse">Impulse risk</span>
+                <span class="result-stat-val" id="impulseRiskValue">—</span>
+              </div>
+            </div>
+
+            <!-- Goal impact -->
+            <div class="result-goal" id="goalBlock">
+              <span class="result-label" data-i18n="result.goal">Goal Impact</span>
+              <p class="result-text" id="goalImpactValue">—</p>
+            </div>
+
+            <!-- Cooling off timer (shown when verdict=wait) -->
+            <div class="cooling-block hidden" id="coolingBlock">
+              <span class="result-label" data-i18n="result.cooling">Cooling-off period</span>
+              <div class="cooling-timer" id="coolingTimer">48:00:00</div>
+              <p class="cooling-hint" data-i18n="result.coolingHint">Come back after this timer — if you still want it, it's probably worth it.</p>
+            </div>
+
+            <!-- Actions -->
+            <div class="result-actions">
+              <button class="btn btn-secondary" id="saveHistoryBtn" data-i18n="result.save">Save to history</button>
+              <button class="btn btn-ghost" id="wishlistBtn" data-i18n="result.wishlist">Add to wishlist</button>
+              <button class="btn btn-ghost" id="analyzeAnotherBtn" data-i18n="result.another">New analysis</button>
+            </div>
+
+          </div>
         </div>
-        <p class="list-meta"></p>
-      </div>
-      <div class="item-actions">
-        <button type="button" class="inline-btn" data-action="bought">Mark as bought</button>
-        <button type="button" class="inline-btn" data-action="dismiss">Dismiss</button>
-        <button type="button" class="inline-btn danger-text" data-action="delete">Delete</button>
-      </div>
-    </article>
-  </template>
 
-  <script src="script.js"></script>
+        <!-- Wishlist -->
+        <div class="card wishlist-card">
+          <div class="card-header">
+            <span class="card-eyebrow" data-i18n="wishlist.title">Wishlist</span>
+          </div>
+          <div id="wishlistList" class="wishlist-list"></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══ TAB: COMPARE ═══ -->
+  <section class="tab-panel" id="tab-compare">
+    <div class="compare-hero">
+      <h2 data-i18n="compare.title">Product Comparator</h2>
+      <p data-i18n="compare.sub">Analyze two products side by side and find the better choice.</p>
+    </div>
+
+    <div class="compare-layout">
+
+      <!-- Product A -->
+      <div class="compare-col">
+        <div class="card compare-card" id="compareCardA">
+          <div class="compare-label label-a">A</div>
+          <form class="compare-form" id="compareFormA" novalidate>
+            <div class="field">
+              <label data-i18n="form.name">Product name</label>
+              <input name="productName" type="text" placeholder="Product A" required />
+            </div>
+            <div class="field">
+              <label data-i18n="form.price">Price (EUR)</label>
+              <input name="price" type="number" min="0" step="0.01" placeholder="0" required />
+            </div>
+            <div class="sliders-grid sliders-grid--2">
+              <div class="slider-card">
+                <div class="slider-top"><span data-i18n="slider.necessity">Necessity</span><span class="slider-val" data-range-output="necessityScoreA">5</span></div>
+                <input name="necessityScore" id="necessityScoreA" type="range" min="1" max="10" value="5" />
+              </div>
+              <div class="slider-card">
+                <div class="slider-top"><span data-i18n="slider.frequency">Frequency</span><span class="slider-val" data-range-output="frequencyScoreA">5</span></div>
+                <input name="frequencyScore" id="frequencyScoreA" type="range" min="1" max="10" value="5" />
+              </div>
+              <div class="slider-card">
+                <div class="slider-top"><span data-i18n="slider.urgency">Urgency</span><span class="slider-val" data-range-output="urgencyScoreA">5</span></div>
+                <input name="urgencyScore" id="urgencyScoreA" type="range" min="1" max="10" value="5" />
+              </div>
+              <div class="slider-card">
+                <div class="slider-top"><span data-i18n="slider.longterm">Long-term</span><span class="slider-val" data-range-output="longTermValueScoreA">5</span></div>
+                <input name="longTermValueScore" id="longTermValueScoreA" type="range" min="1" max="10" value="5" />
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- VS -->
+      <div class="compare-vs">
+        <span>VS</span>
+      </div>
+
+      <!-- Product B -->
+      <div class="compare-col">
+        <div class="card compare-card" id="compareCardB">
+          <div class="compare-label label-b">B</div>
+          <form class="compare-form" id="compareFormB" novalidate>
+            <div class="field">
+              <label data-i18n="form.name">Product name</label>
+              <input name="productName" type="text" placeholder="Product B" required />
+            </div>
+            <div class="field">
+              <label data-i18n="form.price">Price (EUR)</label>
+              <input name="price" type="number" min="0" step="0.01" placeholder="0" required />
+            </div>
+            <div class="sliders-grid sliders-grid--2">
+              <div class="slider-card">
+                <div class="slider-top"><span data-i18n="slider.necessity">Necessity</span><span class="slider-val" data-range-output="necessityScoreB">5</span></div>
+                <input name="necessityScore" id="necessityScoreB" type="range" min="1" max="10" value="5" />
+              </div>
+              <div class="slider-card">
+                <div class="slider-top"><span data-i18n="slider.frequency">Frequency</span><span class="slider-val" data-range-output="frequencyScoreB">5</span></div>
+                <input name="frequencyScore" id="frequencyScoreB" type="range" min="1" max="10" value="5" />
+              </div>
+              <div class="slider-card">
+                <div class="slider-top"><span data-i18n="slider.urgency">Urgency</span><span class="slider-val" data-range-output="urgencyScoreA2">5</span></div>
+                <input name="urgencyScore" id="urgencyScoreA2" type="range" min="1" max="10" value="5" />
+              </div>
+              <div class="slider-card">
+                <div class="slider-top"><span data-i18n="slider.longterm">Long-term</span><span class="slider-val" data-range-output="longTermValueScoreB">5</span></div>
+                <input name="longTermValueScore" id="longTermValueScoreB" type="range" min="1" max="10" value="5" />
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Shared financial context for compare -->
+    <div class="card compare-finance-card">
+      <div class="card-eyebrow" data-i18n="form.financial">Financial Context (shared)</div>
+      <div class="field-row">
+        <div class="field">
+          <label data-i18n="form.income">Monthly income (EUR)</label>
+          <input id="cmpMonthlyIncome" type="number" min="0" step="0.01" placeholder="0" />
+        </div>
+        <div class="field">
+          <label data-i18n="form.savings">Savings (EUR)</label>
+          <input id="cmpSavings" type="number" min="0" step="0.01" placeholder="0" />
+        </div>
+        <div class="field">
+          <label data-i18n="form.hourly">Hourly income (EUR)</label>
+          <input id="cmpHourlyIncome" type="number" min="0" step="0.01" placeholder="0" />
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" id="compareBtn" data-i18n="compare.run">Compare products</button>
+      </div>
+    </div>
+
+    <!-- Compare result -->
+    <div class="compare-result hidden" id="compareResult">
+      <div class="compare-result-grid">
+        <div class="compare-result-card" id="compareResultA">
+          <div class="compare-result-label label-a">A</div>
+          <div class="compare-result-name" id="compareNameA">—</div>
+          <div class="compare-score-ring-wrap">
+            <svg class="score-svg score-svg--sm" viewBox="0 0 120 120">
+              <circle class="score-track" cx="60" cy="60" r="52" />
+              <circle class="score-fill" cx="60" cy="60" r="52" id="compareArcA" />
+            </svg>
+            <div class="score-center score-center--sm">
+              <span class="score-num score-num--sm" id="compareScoreA">0</span>
+            </div>
+          </div>
+          <div class="compare-verdict" id="compareVerdictA">—</div>
+          <div class="compare-stats-mini" id="compareStatsA"></div>
+        </div>
+
+        <div class="compare-winner" id="compareWinner">
+          <div class="winner-label" data-i18n="compare.winner">Better choice</div>
+          <div class="winner-name" id="winnerName">—</div>
+          <div class="winner-reason" id="winnerReason"></div>
+        </div>
+
+        <div class="compare-result-card" id="compareResultB">
+          <div class="compare-result-label label-b">B</div>
+          <div class="compare-result-name" id="compareNameB">—</div>
+          <div class="compare-score-ring-wrap">
+            <svg class="score-svg score-svg--sm" viewBox="0 0 120 120">
+              <circle class="score-track" cx="60" cy="60" r="52" />
+              <circle class="score-fill" cx="60" cy="60" r="52" id="compareArcB" />
+            </svg>
+            <div class="score-center score-center--sm">
+              <span class="score-num score-num--sm" id="compareScoreB">0</span>
+            </div>
+          </div>
+          <div class="compare-verdict" id="compareVerdictB">—</div>
+          <div class="compare-stats-mini" id="compareStatsB"></div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ═══ TAB: HISTORY ═══ -->
+  <section class="tab-panel" id="tab-history">
+    <div class="history-header">
+      <h2 data-i18n="history.title">Decision History</h2>
+      <div class="overview-row">
+        <div class="ov-card">
+          <span class="ov-val" id="ovTotal">0</span>
+          <span class="ov-lbl" data-i18n="history.total">Total</span>
+        </div>
+        <div class="ov-card ov-buy">
+          <span class="ov-val" id="ovBuy">0</span>
+          <span class="ov-lbl" data-i18n="history.buy">Buy</span>
+        </div>
+        <div class="ov-card ov-wait">
+          <span class="ov-val" id="ovWait">0</span>
+          <span class="ov-lbl" data-i18n="history.wait">Wait</span>
+        </div>
+        <div class="ov-card ov-skip">
+          <span class="ov-val" id="ovSkip">0</span>
+          <span class="ov-lbl" data-i18n="history.skip">Skip</span>
+        </div>
+        <div class="ov-card ov-avoided">
+          <span class="ov-val accent" id="ovAvoided">€0</span>
+          <span class="ov-lbl" data-i18n="history.avoided">Avoided</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bars -->
+    <div class="card bars-card">
+      <div class="bar-row">
+        <span class="bar-lbl" data-i18n="history.buy">Buy</span>
+        <div class="bar-track"><div class="bar-fill bar-fill--buy" id="buyBar"></div></div>
+        <span class="bar-pct" id="buyPct">0%</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-lbl" data-i18n="history.wait">Wait</span>
+        <div class="bar-track"><div class="bar-fill bar-fill--wait" id="waitBar"></div></div>
+        <span class="bar-pct" id="waitPct">0%</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-lbl" data-i18n="history.skip">Skip</span>
+        <div class="bar-track"><div class="bar-fill bar-fill--skip" id="skipBar"></div></div>
+        <span class="bar-pct" id="skipPct">0%</span>
+      </div>
+    </div>
+
+    <div class="history-list" id="historyList"></div>
+  </section>
+
+</div><!-- end app-shell -->
+
+<!-- Templates -->
+<template id="historyItemTpl">
+  <div class="history-item">
+    <div class="history-item-top">
+      <span class="history-name"></span>
+      <span class="verdict-tag"></span>
+    </div>
+    <div class="history-item-meta"></div>
+    <div class="history-item-exp"></div>
+  </div>
+</template>
+
+<template id="wishlistItemTpl">
+  <div class="wishlist-item">
+    <div class="wishlist-item-info">
+      <span class="wishlist-name"></span>
+      <span class="wishlist-meta"></span>
+    </div>
+    <div class="wishlist-item-actions">
+      <button class="wl-btn" data-action="bought">✓</button>
+      <button class="wl-btn" data-action="dismiss">⏸</button>
+      <button class="wl-btn wl-btn--danger" data-action="delete">✕</button>
+    </div>
+  </div>
+</template>
+
+<script src="script.js"></script>
 </body>
 </html>

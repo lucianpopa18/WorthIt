@@ -1,609 +1,837 @@
-const STORAGE_KEYS = {
-  decisions: 'worthit_decisions',
-  wishlist: 'worthit_wishlist',
-  profile: 'worthit_profile',
+/* ═══════════════════════════════════════════
+   WORTHIT — script.js (full rewrite)
+   Fixes: save-on-confirm, dup wishlist,
+   money-avoided logic, animation, i18n,
+   custom modals, consistent lang
+   New: comparator, cooling-off timer, i18n
+═══════════════════════════════════════════ */
+
+// ── i18n ─────────────────────────────────
+const TRANSLATIONS = {
+  en: {
+    'nav.analyze': 'Analyze',
+    'nav.compare': 'Compare',
+    'nav.history': 'History',
+    'settings.title': 'Settings',
+    'settings.language': 'Language',
+    'settings.theme': 'Theme',
+    'settings.dark': 'Dark',
+    'settings.light': 'Light',
+    'settings.reset': 'Danger zone',
+    'settings.resetBtn': 'Reset all saved data',
+    'confirm.title': 'Are you sure?',
+    'confirm.body': 'This will permanently delete all saved decisions, wishlist and profile data.',
+    'confirm.yes': 'Yes, delete everything',
+    'confirm.no': 'Cancel',
+    'hero.analyses': 'analyses',
+    'hero.avoided': 'money avoided',
+    'hero.buyRate': 'buy rate',
+    'form.eyebrow': 'Purchase Details',
+    'form.name': 'Product name',
+    'form.price': 'Price (EUR)',
+    'form.category': 'Category',
+    'form.mood': 'Current mood',
+    'form.reason': 'Why do you want it?',
+    'form.days': "Days you've wanted it",
+    'form.alternative': 'I already have a reasonable alternative',
+    'form.financial': 'Financial Context',
+    'form.income': 'Monthly income (EUR)',
+    'form.budget': 'Available budget (EUR)',
+    'form.savings': 'Savings (EUR)',
+    'form.hourly': 'Hourly income (EUR)',
+    'form.goalName': 'Financial goal',
+    'form.goalTarget': 'Goal target (EUR)',
+    'form.goalCurrent': 'Goal progress (EUR)',
+    'form.submit': 'Calculate verdict',
+    'form.reset': 'Reset',
+    'slider.necessity': 'Necessity',
+    'slider.necessityHint': 'How much do you actually need it?',
+    'slider.urgency': 'Urgency',
+    'slider.urgencyHint': 'How urgent is it right now?',
+    'slider.frequency': 'Frequency',
+    'slider.frequencyHint': 'How often will you use it?',
+    'slider.longterm': 'Long-term value',
+    'slider.longtermHint': 'Value over time?',
+    'mood.neutral': 'Neutral',
+    'mood.calm': 'Calm',
+    'mood.stressed': 'Stressed',
+    'mood.bored': 'Bored',
+    'mood.excited': 'Excited',
+    'mood.sad': 'Sad',
+    'result.emptyTitle': 'Awaiting analysis',
+    'result.emptySub': 'Fill in the form to get your verdict',
+    'result.score': 'Score',
+    'result.explanation': 'Analysis',
+    'result.income': '% of income',
+    'result.savings': '% of savings',
+    'result.hours': 'Hours of work',
+    'result.impulse': 'Impulse risk',
+    'result.goal': 'Goal Impact',
+    'result.cooling': 'Cooling-off period',
+    'result.coolingHint': "Come back after this timer — if you still want it, it's probably worth it.",
+    'result.save': 'Save to history',
+    'result.wishlist': 'Add to wishlist',
+    'result.another': 'New analysis',
+    'wishlist.title': 'Wishlist',
+    'compare.title': 'Product Comparator',
+    'compare.sub': 'Analyze two products side by side and find the better choice.',
+    'compare.run': 'Compare products',
+    'compare.winner': 'Better choice',
+    'history.title': 'Decision History',
+    'history.total': 'Total',
+    'history.buy': 'Buy',
+    'history.wait': 'Wait',
+    'history.skip': 'Skip',
+    'history.avoided': 'Avoided',
+    'verdict.buy': 'Buy',
+    'verdict.wait': 'Wait',
+    'verdict.skip': 'Do not buy',
+    'impulse.low': 'Low',
+    'impulse.medium': 'Medium',
+    'impulse.high': 'High',
+    'empty.history': 'No saved decisions yet.',
+    'empty.wishlist': 'Wishlist is empty.',
+    'explanation.buy': 'The verdict is favorable.',
+    'explanation.wait': 'Not a clear no — but the timing is not ideal yet.',
+    'explanation.skip': 'It is better not to buy this right now.',
+    'explanation.pro': 'Pros: ',
+    'explanation.caution': 'Cautions: ',
+    'explanation.noPro': 'No strong signals clearly supporting this purchase.',
+    'explanation.noCaution': 'No major warning signals in the current context.',
+    'pos.realNeed': 'appears to be a real need',
+    'pos.usedOften': 'likely to be used frequently',
+    'pos.ltv': 'offers good long-term value',
+    'pos.notImpulse': 'you have wanted it long enough that it does not seem impulsive',
+    'pos.affordable': 'affordable relative to your monthly income',
+    'pos.clearReason': 'you have a clear reason for this purchase',
+    'caut.bigIncome': 'takes a large share of monthly income',
+    'caut.bigSavings': 'significantly impacts savings',
+    'caut.hasAlt': 'you already have a reasonable alternative',
+    'caut.impulse': 'context shows high impulse buying risk',
+    'caut.goalDelay': 'slows down your financial goal',
+    'caut.recentWant': 'you have wanted it for a very short time',
+    'caut.overBudget': 'exceeds your available monthly budget',
+    'goal.none': 'No goal set.',
+    'goal.funded': 'Your "{name}" goal is already fully funded.',
+    'goal.all': 'This purchase would consume the entire remaining amount for "{name}".',
+    'goal.pct': 'This purchase would consume {pct}% of the remaining amount for "{name}".',
+    'compare.tie': 'It\'s a tie!',
+    'compare.reason': '{nameA} scores {scoreA} vs {nameB} scores {scoreB}. {nameA} offers {diff} more points of value.',
+    'compare.tieReason': 'Both products scored equally. Consider price and personal preference.',
+  },
+  ro: {
+    'nav.analyze': 'Analiză',
+    'nav.compare': 'Comparare',
+    'nav.history': 'Istoric',
+    'settings.title': 'Setări',
+    'settings.language': 'Limbă',
+    'settings.theme': 'Temă',
+    'settings.dark': 'Întunecat',
+    'settings.light': 'Luminos',
+    'settings.reset': 'Zonă periculoasă',
+    'settings.resetBtn': 'Șterge toate datele salvate',
+    'confirm.title': 'Ești sigur?',
+    'confirm.body': 'Aceasta va șterge definitiv toate deciziile, lista de dorințe și datele de profil.',
+    'confirm.yes': 'Da, șterge tot',
+    'confirm.no': 'Anulează',
+    'hero.analyses': 'analize',
+    'hero.avoided': 'bani evitați',
+    'hero.buyRate': 'rată cumpărare',
+    'form.eyebrow': 'Detalii Produs',
+    'form.name': 'Nume produs',
+    'form.price': 'Preț (EUR)',
+    'form.category': 'Categorie',
+    'form.mood': 'Stare actuală',
+    'form.reason': 'De ce îl vrei?',
+    'form.days': 'Zile de când îl vrei',
+    'form.alternative': 'Am deja o alternativă rezonabilă',
+    'form.financial': 'Context Financiar',
+    'form.income': 'Venit lunar (EUR)',
+    'form.budget': 'Buget disponibil (EUR)',
+    'form.savings': 'Economii (EUR)',
+    'form.hourly': 'Venit orar (EUR)',
+    'form.goalName': 'Obiectiv financiar',
+    'form.goalTarget': 'Țintă obiectiv (EUR)',
+    'form.goalCurrent': 'Progres obiectiv (EUR)',
+    'form.submit': 'Calculează verdictul',
+    'form.reset': 'Resetează',
+    'slider.necessity': 'Necesitate',
+    'slider.necessityHint': 'Cât de mult ai cu adevărat nevoie de el?',
+    'slider.urgency': 'Urgență',
+    'slider.urgencyHint': 'Cât de urgent este acum?',
+    'slider.frequency': 'Frecvență',
+    'slider.frequencyHint': 'Cât de des îl vei folosi?',
+    'slider.longterm': 'Valoare pe termen lung',
+    'slider.longtermHint': 'Valoare în timp?',
+    'mood.neutral': 'Neutru',
+    'mood.calm': 'Calm',
+    'mood.stressed': 'Stresat',
+    'mood.bored': 'Plictisit',
+    'mood.excited': 'Entuziasmat',
+    'mood.sad': 'Trist',
+    'result.emptyTitle': 'Aștept analiza',
+    'result.emptySub': 'Completează formularul pentru a obține verdictul',
+    'result.score': 'Scor',
+    'result.explanation': 'Analiză',
+    'result.income': '% din venit',
+    'result.savings': '% din economii',
+    'result.hours': 'Ore de muncă',
+    'result.impulse': 'Risc impulsiv',
+    'result.goal': 'Impact obiectiv',
+    'result.cooling': 'Perioadă de reflecție',
+    'result.coolingHint': 'Revino după ce timer-ul se termină — dacă tot îl vrei, probabil merită.',
+    'result.save': 'Salvează în istoric',
+    'result.wishlist': 'Adaugă în lista de dorințe',
+    'result.another': 'Analiză nouă',
+    'wishlist.title': 'Listă de dorințe',
+    'compare.title': 'Comparator Produse',
+    'compare.sub': 'Analizează două produse side-by-side și găsește alegerea mai bună.',
+    'compare.run': 'Compară produsele',
+    'compare.winner': 'Alegerea mai bună',
+    'history.title': 'Istoric Decizii',
+    'history.total': 'Total',
+    'history.buy': 'Cumpără',
+    'history.wait': 'Amână',
+    'history.skip': 'Nu cumpăra',
+    'history.avoided': 'Evitat',
+    'verdict.buy': 'Cumpără',
+    'verdict.wait': 'Amână',
+    'verdict.skip': 'Nu cumpăra',
+    'impulse.low': 'Scăzut',
+    'impulse.medium': 'Mediu',
+    'impulse.high': 'Ridicat',
+    'empty.history': 'Nicio decizie salvată încă.',
+    'empty.wishlist': 'Lista de dorințe este goală.',
+    'explanation.buy': 'Verdictul este favorabil.',
+    'explanation.wait': 'Nu este un refuz clar — dar momentul nu este ideal.',
+    'explanation.skip': 'Momentan este mai bine să nu cumperi.',
+    'explanation.pro': 'Argumente pro: ',
+    'explanation.caution': 'Motive de prudență: ',
+    'explanation.noPro': 'Nu există semnale puternice care să susțină clar achiziția.',
+    'explanation.noCaution': 'Nu apar semnale majore de avertizare în contextul actual.',
+    'pos.realNeed': 'pare o nevoie reală',
+    'pos.usedOften': 'sunt șanse mari să îl folosești des',
+    'pos.ltv': 'oferă valoare bună pe termen lung',
+    'pos.notImpulse': 'îl vrei de suficient timp încât să nu pară un impuls de moment',
+    'pos.affordable': 'costul este ușor de dus raportat la venitul lunar',
+    'pos.clearReason': 'ai un motiv clar pentru această achiziție',
+    'caut.bigIncome': 'ia o parte mare din venitul lunar',
+    'caut.bigSavings': 'taie serios din economii',
+    'caut.hasAlt': 'ai deja o alternativă rezonabilă',
+    'caut.impulse': 'contextul arată un risc mare de cumpărare impulsivă',
+    'caut.goalDelay': 'îți încetinește obiectivul financiar',
+    'caut.recentWant': 'îl vrei de foarte puțin timp',
+    'caut.overBudget': 'depășește bugetul lunar disponibil',
+    'goal.none': 'Niciun obiectiv setat.',
+    'goal.funded': 'Obiectivul tău "{name}" este deja finanțat complet.',
+    'goal.all': 'Această achiziție ar consuma întreaga sumă rămasă pentru "{name}".',
+    'goal.pct': 'Această achiziție ar consuma {pct}% din suma rămasă pentru "{name}".',
+    'compare.tie': 'Egalitate!',
+    'compare.reason': '{nameA} obține {scoreA} vs {nameB} obține {scoreB}. {nameA} oferă cu {diff} puncte mai mult.',
+    'compare.tieReason': 'Ambele produse au obținut același scor. Ia în considerare prețul și preferința personală.',
+  }
 };
 
-const VERDICTS = {
-  buy: 'Buy',
-  wait: 'Wait',
-  skip: 'Do not buy now',
-};
+let currentLang = 'en';
 
-const IMPULSE_RISK = {
-  low: 'Low',
-  medium: 'Medium',
-  high: 'High',
-};
-
-const IMPULSE_MOODS = ['stressed', 'bored', 'excited'];
-
-const form = document.getElementById('purchaseForm');
-const resetFormBtn = document.getElementById('resetFormBtn');
-const resultEmptyState = document.getElementById('resultEmptyState');
-const resultContent = document.getElementById('resultContent');
-const wishlistBtn = document.getElementById('wishlistBtn');
-const analyzeAnotherBtn = document.getElementById('analyzeAnotherBtn');
-const resetDataBtn = document.getElementById('resetDataBtn');
-
-let lastAnalysis = null;
-
-function formatCurrency(value) {
-  const amount = Number.isFinite(Number(value)) ? Number(value) : 0;
-  return new Intl.NumberFormat('en-IE', {
-    style: 'currency',
-    currency: 'EUR',
-    maximumFractionDigits: 2,
-  }).format(amount);
+function t(key, vars = {}) {
+  let str = (TRANSLATIONS[currentLang] || TRANSLATIONS.en)[key] || key;
+  for (const [k, v] of Object.entries(vars)) {
+    str = str.replaceAll(`{${k}}`, v);
+  }
+  return str;
 }
 
-function formatPercent(value) {
-  return `${Number(value || 0).toFixed(1)}%`;
+function applyTranslations() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    el.textContent = t(key);
+  });
 }
 
-function formatHours(value) {
-  return `${Number(value || 0).toFixed(1)}h`;
-}
+// ── Storage ──────────────────────────────
+const SK = { decisions: 'worthit_decisions', wishlist: 'worthit_wishlist', profile: 'worthit_profile', settings: 'worthit_settings' };
 
-function formatDate(value) {
-  const date = value ? new Date(value) : new Date();
-  return new Intl.DateTimeFormat('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  }).format(date);
+function readJSON(key, fallback) {
+  try { const r = localStorage.getItem(key); return r ? JSON.parse(r) : fallback; }
+  catch { return fallback; }
 }
+function writeJSON(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
 
-function safeNumber(value) {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : 0;
-}
+function getDecisions()  { const d = readJSON(SK.decisions, []); return Array.isArray(d) ? d : []; }
+function getWishlist()   { const d = readJSON(SK.wishlist, []);  return Array.isArray(d) ? d : []; }
+function getProfile()    { return readJSON(SK.profile, {}); }
+function getSettings()   { return readJSON(SK.settings, { lang: 'en', theme: 'dark' }); }
 
-function clamp(value, min, max) {
-  return Math.min(Math.max(value, min), max);
-}
+function saveDecision(dec)  { const arr = getDecisions(); arr.unshift(dec); writeJSON(SK.decisions, arr.slice(0, 100)); }
+function saveWishlistItem(i){ const arr = getWishlist();  arr.unshift(i);   writeJSON(SK.wishlist,  arr.slice(0, 100)); }
+function updateWishlistItem(id, upd) { writeJSON(SK.wishlist, getWishlist().map(i => i.id === id ? {...i,...upd} : i)); }
+function deleteWishlistItem(id)      { writeJSON(SK.wishlist, getWishlist().filter(i => i.id !== id)); }
 
-function slugifyVerdict(verdict) {
-  if (verdict === VERDICTS.buy) return 'buy';
-  if (verdict === VERDICTS.wait) return 'wait';
+// ── Helpers ───────────────────────────────
+function safeNum(v)    { const n = Number(v); return Number.isFinite(n) ? n : 0; }
+function clamp(v,a,b)  { return Math.min(Math.max(v,a),b); }
+function fmtCurrency(v){ return new Intl.NumberFormat('en-IE', { style:'currency', currency:'EUR', maximumFractionDigits:2 }).format(safeNum(v)); }
+function fmtPct(v)     { return `${safeNum(v).toFixed(1)}%`; }
+function fmtHours(v)   { return `${safeNum(v).toFixed(1)}h`; }
+function fmtDate(v)    { return new Intl.DateTimeFormat('en-GB', { day:'2-digit', month:'short', year:'numeric' }).format(v ? new Date(v) : new Date()); }
+
+function verdictKey(verdict) {
+  if (verdict === 'buy')  return 'buy';
+  if (verdict === 'wait') return 'wait';
   return 'skip';
 }
 
-function getStorageArray(key) {
-  try {
-    const raw = localStorage.getItem(key);
-    const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
+// ── Engine ────────────────────────────────
+const IMPULSE_MOODS = ['stressed','bored','excited'];
+
+function calculateImpulseRisk(d) {
+  let pts = 0;
+  if (d.daysWanted <= 2)                pts += 2;
+  if (d.necessityScore <= 5)            pts += 1;
+  if (d.urgencyScore <= 4)              pts += 1;
+  if (d.hasAlternative)                 pts += 1;
+  if (IMPULSE_MOODS.includes(d.mood))   pts += 2;
+  if (pts >= 5) return 'high';
+  if (pts >= 3) return 'medium';
+  return 'low';
 }
 
-function setStorageArray(key, value) {
-  localStorage.setItem(key, JSON.stringify(value));
+function getGoalImpact(d) {
+  if (!d.mainGoalName || d.mainGoalTarget <= 0) return t('goal.none');
+  const remaining = Math.max(d.mainGoalTarget - d.mainGoalCurrent, 0);
+  if (remaining <= 0) return t('goal.funded', { name: d.mainGoalName });
+  if (d.price >= remaining) return t('goal.all', { name: d.mainGoalName });
+  const pct = clamp((d.price / remaining) * 100, 0, 100).toFixed(1);
+  return t('goal.pct', { pct, name: d.mainGoalName });
 }
 
-function getProfile() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEYS.profile);
-    const parsed = raw ? JSON.parse(raw) : {};
-    return parsed && typeof parsed === 'object' ? parsed : {};
-  } catch {
-    return {};
-  }
-}
-
-function saveProfile(profile) {
-  localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify(profile));
-}
-
-function getDecisions() {
-  return getStorageArray(STORAGE_KEYS.decisions);
-}
-
-function saveDecision(decision) {
-  const decisions = getDecisions();
-  decisions.unshift(decision);
-  setStorageArray(STORAGE_KEYS.decisions, decisions.slice(0, 100));
-}
-
-function getWishlist() {
-  return getStorageArray(STORAGE_KEYS.wishlist);
-}
-
-function saveWishlist(item) {
-  const wishlist = getWishlist();
-  wishlist.unshift(item);
-  setStorageArray(STORAGE_KEYS.wishlist, wishlist.slice(0, 100));
-}
-
-function updateWishlistItem(id, updates) {
-  const wishlist = getWishlist().map((item) => (item.id === id ? { ...item, ...updates } : item));
-  setStorageArray(STORAGE_KEYS.wishlist, wishlist);
-}
-
-function deleteWishlistItem(id) {
-  const wishlist = getWishlist().filter((item) => item.id !== id);
-  setStorageArray(STORAGE_KEYS.wishlist, wishlist);
-}
-
-function populateProfileFields() {
-  const profile = getProfile();
-  ['monthlyIncome', 'monthlyBudget', 'savings', 'hourlyIncome', 'mainGoalName', 'mainGoalTarget', 'mainGoalCurrent'].forEach((key) => {
-    const field = document.getElementById(key);
-    if (!field) return;
-    if (profile[key] !== undefined && profile[key] !== null && profile[key] !== '') {
-      field.value = profile[key];
-    }
-  });
-}
-
-function persistProfileFromForm(data) {
-  saveProfile({
-    monthlyIncome: data.monthlyIncome,
-    monthlyBudget: data.monthlyBudget,
-    savings: data.savings,
-    hourlyIncome: data.hourlyIncome,
-    mainGoalName: data.mainGoalName,
-    mainGoalTarget: data.mainGoalTarget,
-    mainGoalCurrent: data.mainGoalCurrent,
-  });
-}
-
-function getFormData() {
-  return {
-    productName: form.productName.value.trim(),
-    price: safeNumber(form.price.value),
-    category: form.category.value.trim() || 'Other',
-    reason: form.reason.value.trim(),
-    necessityScore: safeNumber(form.necessityScore.value),
-    urgencyScore: safeNumber(form.urgencyScore.value),
-    frequencyScore: safeNumber(form.frequencyScore.value),
-    longTermValueScore: safeNumber(form.longTermValueScore.value),
-    hasAlternative: form.hasAlternative.checked,
-    daysWanted: safeNumber(form.daysWanted.value),
-    mood: form.mood.value,
-    monthlyIncome: safeNumber(form.monthlyIncome.value),
-    monthlyBudget: safeNumber(form.monthlyBudget.value),
-    savings: safeNumber(form.savings.value),
-    hourlyIncome: safeNumber(form.hourlyIncome.value),
-    mainGoalName: form.mainGoalName.value.trim(),
-    mainGoalTarget: safeNumber(form.mainGoalTarget.value),
-    mainGoalCurrent: safeNumber(form.mainGoalCurrent.value),
-  };
-}
-
-function calculateImpulseRisk(data) {
-  let points = 0;
-
-  if (data.daysWanted <= 2) points += 2;
-  if (data.necessityScore <= 5) points += 1;
-  if (data.urgencyScore <= 4) points += 1;
-  if (data.hasAlternative) points += 1;
-  if (IMPULSE_MOODS.includes(data.mood)) points += 2;
-
-  if (points >= 5) return IMPULSE_RISK.high;
-  if (points >= 3) return IMPULSE_RISK.medium;
-  return IMPULSE_RISK.low;
-}
-
-function getGoalImpactText(data) {
-  const goalName = data.mainGoalName;
-  const target = data.mainGoalTarget;
-  const current = data.mainGoalCurrent;
-
-  if (!goalName || target <= 0) {
-    return 'No goal set.';
-  }
-
-  const remaining = Math.max(target - current, 0);
-
-  if (remaining <= 0) {
-    return `Your “${goalName}” goal is already fully funded.`;
-  }
-
-  if (data.price >= remaining) {
-    return `This purchase would consume the entire remaining amount for “${goalName}”.`;
-  }
-
-  const percent = clamp((data.price / remaining) * 100, 0, 100);
-  return `This purchase would consume ${percent.toFixed(1)}% of the remaining amount for “${goalName}”.`;
-}
-
-function generateExplanation(result, data) {
+function buildExplanation(result, d) {
   const positives = [];
-  const cautions = [];
+  const cautions  = [];
 
-  if (data.necessityScore >= 7) positives.push('pare o nevoie reală');
-  if (data.frequencyScore >= 7) positives.push('sunt șanse mari să îl folosești des');
-  if (data.longTermValueScore >= 7) positives.push('oferă valoare bună pe termen lung');
-  if (data.daysWanted >= 7) positives.push('îl vrei de suficient timp încât să nu pară doar un impuls de moment');
-  if (result.costVsIncomePercent <= 10) positives.push('costul este ușor de dus raportat la venitul tău lunar');
-  if (data.reason.length >= 18) positives.push('ai un motiv destul de clar pentru această achiziție');
+  if (d.necessityScore >= 7)                          positives.push(t('pos.realNeed'));
+  if (d.frequencyScore >= 7)                          positives.push(t('pos.usedOften'));
+  if (d.longTermValueScore >= 7)                      positives.push(t('pos.ltv'));
+  if (d.daysWanted >= 7)                              positives.push(t('pos.notImpulse'));
+  if (result.costVsIncomePercent <= 10)               positives.push(t('pos.affordable'));
+  if (d.reason && d.reason.length >= 18)              positives.push(t('pos.clearReason'));
 
-  if (result.costVsIncomePercent >= 30) cautions.push('ia o parte mare din venitul lunar');
-  if (result.costVsSavingsPercent >= 20) cautions.push('taie serios din economii');
-  if (data.hasAlternative) cautions.push('ai deja o alternativă rezonabilă');
-  if (result.impulseRisk === IMPULSE_RISK.high) cautions.push('contextul arată un risc mare de cumpărare impulsivă');
-  if (data.mainGoalName && /consume|remaining/i.test(result.goalImpactText)) cautions.push('îți încetinește obiectivul financiar');
-  if (data.daysWanted <= 2) cautions.push('îl vrei de foarte puțin timp');
-  if (data.monthlyBudget > 0 && data.price > data.monthlyBudget) cautions.push('depășește bugetul lunar disponibil');
+  if (result.costVsIncomePercent >= 30)               cautions.push(t('caut.bigIncome'));
+  if (result.costVsSavingsPercent >= 20)              cautions.push(t('caut.bigSavings'));
+  if (d.hasAlternative)                               cautions.push(t('caut.hasAlt'));
+  if (result.impulseRisk === 'high')                  cautions.push(t('caut.impulse'));
+  if (d.mainGoalName && /consume|remaining|obiectiv|rămasă/i.test(result.goalImpactText)) cautions.push(t('caut.goalDelay'));
+  if (d.daysWanted <= 2)                              cautions.push(t('caut.recentWant'));
+  if (d.monthlyBudget > 0 && d.price > d.monthlyBudget) cautions.push(t('caut.overBudget'));
 
-  const positiveSentence = positives.length
-    ? `Argumente pro: ${positives.join(', ')}.`
-    : 'Nu există destule semnale puternice care să susțină clar achiziția.';
+  const prePro     = positives.length ? t('explanation.pro') + positives.join(', ') + '.' : t('explanation.noPro');
+  const preCaution = cautions.length  ? t('explanation.caution') + cautions.join(', ') + '.' : t('explanation.noCaution');
+  const intro      = result.verdictKey === 'buy' ? t('explanation.buy') : result.verdictKey === 'wait' ? t('explanation.wait') : t('explanation.skip');
 
-  const cautionSentence = cautions.length
-    ? `Motive de prudență: ${cautions.join(', ')}.`
-    : 'Nu apar semnale majore de avertizare în contextul actual.';
-
-  if (result.verdict === VERDICTS.buy) {
-    return `Verdictul este favorabil. ${positiveSentence} ${cautionSentence}`;
-  }
-
-  if (result.verdict === VERDICTS.wait) {
-    return `Produsul nu este un refuz clar, dar momentul nu este ideal încă. ${positiveSentence} ${cautionSentence}`;
-  }
-
-  return `Momentan este mai bine să nu cumperi. ${positiveSentence} ${cautionSentence}`;
+  return `${intro} ${prePro} ${preCaution}`;
 }
 
-function evaluatePurchase(data) {
-  const costVsIncomePercent = data.monthlyIncome > 0 ? (data.price / data.monthlyIncome) * 100 : 100;
-  const costVsSavingsPercent = data.savings > 0 ? (data.price / data.savings) * 100 : 100;
-  const hoursOfWork = data.hourlyIncome > 0 ? data.price / data.hourlyIncome : data.price;
-  const impulseRisk = calculateImpulseRisk(data);
-  const goalImpactText = getGoalImpactText(data);
+function evaluate(d) {
+  const costVsIncomePercent  = d.monthlyIncome > 0 ? (d.price / d.monthlyIncome) * 100 : 100;
+  const costVsSavingsPercent = d.savings > 0       ? (d.price / d.savings) * 100        : 100;
+  const hoursOfWork          = d.hourlyIncome > 0  ? d.price / d.hourlyIncome           : d.price;
+  const impulseRisk          = calculateImpulseRisk(d);
 
-  const necessityPoints = clamp((data.necessityScore / 10) * 24, 0, 24);
-  const frequencyPoints = clamp((data.frequencyScore / 10) * 16, 0, 16);
-  const longTermValuePoints = clamp((data.longTermValueScore / 10) * 20, 0, 20);
-  const urgencyDistance = Math.abs(data.urgencyScore - 6);
-  const urgencyPoints = clamp(12 - urgencyDistance * 2, 0, 12);
+  const necessityPts     = clamp((d.necessityScore / 10) * 24, 0, 24);
+  const frequencyPts     = clamp((d.frequencyScore / 10) * 16, 0, 16);
+  const ltvPts           = clamp((d.longTermValueScore / 10) * 20, 0, 20);
+  const urgencyDist      = Math.abs(d.urgencyScore - 6);
+  const urgencyPts       = clamp(12 - urgencyDist * 2, 0, 12);
 
-  const incomePenalty = clamp(costVsIncomePercent * 0.55, 0, 18);
-  const savingsPenalty = clamp(costVsSavingsPercent * 0.25, 0, 15);
-  const budgetPenalty = data.monthlyBudget > 0 ? clamp(((data.price - data.monthlyBudget) / data.monthlyBudget) * 25, 0, 12) : 8;
-  const alternativePenalty = data.hasAlternative ? 8 : 0;
-  const daysPenalty = data.daysWanted <= 2 ? 10 : data.daysWanted <= 7 ? 4 : 0;
-  const moodPenalty = IMPULSE_MOODS.includes(data.mood) ? 7 : data.mood === 'sad' ? 4 : 0;
+  const incomePenalty    = clamp(costVsIncomePercent * 0.55, 0, 18);
+  const savingsPenalty   = clamp(costVsSavingsPercent * 0.25, 0, 15);
+  const budgetPenalty    = d.monthlyBudget > 0 ? clamp(((d.price - d.monthlyBudget) / d.monthlyBudget) * 25, 0, 12) : 8;
+  const altPenalty       = d.hasAlternative ? 8 : 0;
+  const daysPenalty      = d.daysWanted <= 2 ? 10 : d.daysWanted <= 7 ? 4 : 0;
+  const moodPenalty      = IMPULSE_MOODS.includes(d.mood) ? 7 : d.mood === 'sad' ? 4 : 0;
 
   let goalPenalty = 0;
-  if (data.mainGoalName && data.mainGoalTarget > 0) {
-    const remaining = Math.max(data.mainGoalTarget - data.mainGoalCurrent, 0);
-    if (remaining > 0) {
-      goalPenalty = clamp((data.price / remaining) * 18, 0, 18);
-    }
+  if (d.mainGoalName && d.mainGoalTarget > 0) {
+    const remaining = Math.max(d.mainGoalTarget - d.mainGoalCurrent, 0);
+    if (remaining > 0) goalPenalty = clamp((d.price / remaining) * 18, 0, 18);
   }
 
-  const baseScore = necessityPoints + frequencyPoints + longTermValuePoints + urgencyPoints;
-  const penalties = incomePenalty + savingsPenalty + budgetPenalty + alternativePenalty + daysPenalty + moodPenalty + goalPenalty;
-  const finalScore = Math.round(clamp(baseScore - penalties + 28, 0, 100));
+  const base       = necessityPts + frequencyPts + ltvPts + urgencyPts;
+  const penalties  = incomePenalty + savingsPenalty + budgetPenalty + altPenalty + daysPenalty + moodPenalty + goalPenalty;
+  const finalScore = Math.round(clamp(base - penalties + 28, 0, 100));
 
-  let verdict = VERDICTS.skip;
-  if (finalScore >= 75) {
-    verdict = VERDICTS.buy;
-  } else if (finalScore >= 50) {
-    verdict = VERDICTS.wait;
-  }
+  const vk = finalScore >= 75 ? 'buy' : finalScore >= 50 ? 'wait' : 'skip';
+  const goalImpactText = getGoalImpact(d);
 
-  const result = {
-    finalScore,
-    verdict,
-    impulseRisk,
-    costVsIncomePercent,
-    costVsSavingsPercent,
-    hoursOfWork,
-    goalImpactText,
-  };
-
-  result.explanation = generateExplanation(result, data);
+  const result = { finalScore, verdictKey: vk, impulseRisk, costVsIncomePercent, costVsSavingsPercent, hoursOfWork, goalImpactText };
+  result.explanation = buildExplanation(result, d);
   return result;
 }
 
-function getVerdictClass(verdict) {
-  return slugifyVerdict(verdict);
+// ── Score ring animation (SVG) ────────────
+function animateScoreRing(arcEl, score, color) {
+  const circumference = 326.73; // 2π×52
+  const targetOffset  = circumference - (score / 100) * circumference;
+  arcEl.style.stroke = color;
+  arcEl.style.strokeDashoffset = circumference; // reset
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      arcEl.style.strokeDashoffset = targetOffset;
+    });
+  });
 }
 
-function getRiskTone(risk) {
-  if (risk === IMPULSE_RISK.high) return 'danger';
-  if (risk === IMPULSE_RISK.medium) return 'warning';
-  return 'positive';
+const VERDICT_COLORS = { buy: '#22c88a', wait: '#f0a535', skip: '#f05252' };
+
+// ── Cooling-off timer ─────────────────────
+let coolingInterval = null;
+
+function startCoolingTimer() {
+  const timerEl = document.getElementById('coolingTimer');
+  const block   = document.getElementById('coolingBlock');
+  block.classList.remove('hidden');
+
+  if (coolingInterval) clearInterval(coolingInterval);
+  let remaining = 48 * 3600;
+
+  function update() {
+    const h = String(Math.floor(remaining / 3600)).padStart(2, '0');
+    const m = String(Math.floor((remaining % 3600) / 60)).padStart(2, '0');
+    const s = String(remaining % 60).padStart(2, '0');
+    timerEl.textContent = `${h}:${m}:${s}`;
+    if (remaining <= 0) clearInterval(coolingInterval);
+    remaining--;
+  }
+  update();
+  coolingInterval = setInterval(update, 1000);
 }
 
-function updateScoreRing(score, verdictClass) {
-  const ring = document.getElementById('scoreRing');
-  const colorMap = {
-    buy: 'var(--positive)',
-    wait: 'var(--warning)',
-    skip: 'var(--danger)',
+// ── Main form ─────────────────────────────
+const purchaseForm   = document.getElementById('purchaseForm');
+const resultEmpty    = document.getElementById('resultEmpty');
+const resultContent  = document.getElementById('resultContent');
+const saveHistoryBtn = document.getElementById('saveHistoryBtn');
+const wishlistBtn    = document.getElementById('wishlistBtn');
+const analyzeAnotherBtn = document.getElementById('analyzeAnotherBtn');
+const resetFormBtn   = document.getElementById('resetFormBtn');
+
+let pendingResult = null; // holds last evaluation, saved only on explicit button click
+
+function getFormData() {
+  return {
+    productName:       purchaseForm.productName.value.trim(),
+    price:             safeNum(purchaseForm.price.value),
+    category:          purchaseForm.category.value.trim() || 'Other',
+    reason:            purchaseForm.reason.value.trim(),
+    necessityScore:    safeNum(purchaseForm.necessityScore.value),
+    urgencyScore:      safeNum(purchaseForm.urgencyScore.value),
+    frequencyScore:    safeNum(purchaseForm.frequencyScore.value),
+    longTermValueScore:safeNum(purchaseForm.longTermValueScore.value),
+    hasAlternative:    purchaseForm.hasAlternative.checked,
+    daysWanted:        safeNum(purchaseForm.daysWanted.value),
+    mood:              purchaseForm.mood.value,
+    monthlyIncome:     safeNum(purchaseForm.monthlyIncome.value),
+    monthlyBudget:     safeNum(purchaseForm.monthlyBudget.value),
+    savings:           safeNum(purchaseForm.savings.value),
+    hourlyIncome:      safeNum(purchaseForm.hourlyIncome.value),
+    mainGoalName:      purchaseForm.mainGoalName.value.trim(),
+    mainGoalTarget:    safeNum(purchaseForm.mainGoalTarget.value),
+    mainGoalCurrent:   safeNum(purchaseForm.mainGoalCurrent.value),
   };
-  ring.style.setProperty('--ring-angle', `${(score / 100) * 360}deg`);
-  ring.style.setProperty('--ring-color', colorMap[verdictClass]);
+}
+
+function populateProfileFields() {
+  const p = getProfile();
+  ['monthlyIncome','monthlyBudget','savings','hourlyIncome','mainGoalName','mainGoalTarget','mainGoalCurrent'].forEach(k => {
+    const el = purchaseForm[k];
+    if (el && p[k] !== undefined && p[k] !== null && p[k] !== '') el.value = p[k];
+  });
+  // Also fill compare financial fields
+  ['monthlyIncome','savings','hourlyIncome'].forEach(k => {
+    const el = document.getElementById('cmp' + k.charAt(0).toUpperCase() + k.slice(1));
+    if (el && p[k] !== undefined && p[k] !== '') el.value = p[k];
+  });
+}
+
+function resetForm(keepProfile = true) {
+  purchaseForm.reset();
+  purchaseForm.necessityScore.value    = 5;
+  purchaseForm.urgencyScore.value      = 5;
+  purchaseForm.frequencyScore.value    = 5;
+  purchaseForm.longTermValueScore.value= 5;
+  purchaseForm.daysWanted.value        = 3;
+  purchaseForm.mood.value              = 'neutral';
+  if (keepProfile) populateProfileFields();
+  updateAllRangeOutputs();
 }
 
 function renderResult(result, data) {
-  resultEmptyState.classList.add('hidden');
+  resultEmpty.classList.add('hidden');
   resultContent.classList.remove('hidden');
 
-  const verdictClass = getVerdictClass(result.verdict);
-  const riskTone = getRiskTone(result.impulseRisk);
+  const arcEl = document.getElementById('scoreArc');
+  const color  = VERDICT_COLORS[result.verdictKey];
 
-  document.getElementById('finalScoreValue').textContent = result.finalScore;
-  document.getElementById('verdictText').textContent = result.verdict;
-  document.getElementById('verdictPill').textContent = result.verdict;
-  document.getElementById('verdictPill').className = `verdict-pill ${verdictClass}`;
+  // Animate score ring
+  animateScoreRing(arcEl, result.finalScore, color);
+
+  // Score number counter
+  const scoreEl = document.getElementById('finalScoreValue');
+  let cur = 0;
+  const target = result.finalScore;
+  const step  = Math.max(1, Math.round(target / 40));
+  const counter = setInterval(() => {
+    cur = Math.min(cur + step, target);
+    scoreEl.textContent = cur;
+    if (cur >= target) clearInterval(counter);
+  }, 20);
+
+  // Verdict
+  const chip = document.getElementById('verdictChip');
+  chip.textContent = t(`verdict.${result.verdictKey}`);
+  chip.className   = `verdict-chip ${result.verdictKey}`;
+
+  document.getElementById('verdictSub').textContent = result.explanation.split('.')[0] + '.';
   document.getElementById('explanationText').textContent = result.explanation;
-  document.getElementById('incomePercentValue').textContent = formatPercent(result.costVsIncomePercent);
-  document.getElementById('savingsPercentValue').textContent = formatPercent(result.costVsSavingsPercent);
-  document.getElementById('hoursOfWorkValue').textContent = formatHours(result.hoursOfWork);
-  document.getElementById('impulseRiskValue').textContent = result.impulseRisk;
-  document.getElementById('impulseRiskValue').style.color = `var(--${riskTone})`;
+
+  document.getElementById('incomePercentValue').textContent = fmtPct(result.costVsIncomePercent);
+  document.getElementById('savingsPercentValue').textContent= fmtPct(result.costVsSavingsPercent);
+  document.getElementById('hoursOfWorkValue').textContent   = fmtHours(result.hoursOfWork);
+
+  const impulseEl = document.getElementById('impulseRiskValue');
+  impulseEl.textContent = t(`impulse.${result.impulseRisk}`);
+  impulseEl.style.color = VERDICT_COLORS[result.impulseRisk === 'low' ? 'buy' : result.impulseRisk === 'medium' ? 'wait' : 'skip'];
+
   document.getElementById('goalImpactValue').textContent = result.goalImpactText;
 
-  updateScoreRing(result.finalScore, verdictClass);
+  // Cooling-off timer only for "wait" verdict
+  if (result.verdictKey === 'wait') {
+    startCoolingTimer();
+  } else {
+    document.getElementById('coolingBlock').classList.add('hidden');
+    if (coolingInterval) { clearInterval(coolingInterval); coolingInterval = null; }
+  }
 
-  lastAnalysis = {
-    id: crypto.randomUUID(),
+  // Reset save button state
+  saveHistoryBtn.textContent = t('result.save');
+  saveHistoryBtn.disabled = false;
+  wishlistBtn.textContent    = t('result.wishlist');
+
+  pendingResult = {
+    id:          crypto.randomUUID(),
     productName: data.productName,
-    price: data.price,
-    category: data.category,
-    finalScore: result.finalScore,
-    verdict: result.verdict,
+    price:       data.price,
+    category:    data.category,
+    finalScore:  result.finalScore,
+    verdictKey:  result.verdictKey,
     explanation: result.explanation,
     impulseRisk: result.impulseRisk,
     dateCreated: new Date().toISOString(),
   };
 }
 
-function renderDashboard() {
-  const decisions = getDecisions();
-  const total = decisions.length;
-  const accepted = decisions.filter((item) => item.verdict === VERDICTS.buy).length;
-  const postponed = decisions.filter((item) => item.verdict === VERDICTS.wait).length;
-  const rejected = decisions.filter((item) => item.verdict === VERDICTS.skip).length;
-  const avoidedMoney = decisions
-    .filter((item) => item.verdict !== VERDICTS.buy)
-    .reduce((sum, item) => sum + safeNumber(item.price), 0);
-
-  document.getElementById('heroDecisions').textContent = total;
-  document.getElementById('heroAvoided').textContent = formatCurrency(avoidedMoney);
-  document.getElementById('totalDecisionsCard').textContent = total;
-  document.getElementById('acceptedCard').textContent = accepted;
-  document.getElementById('postponedCard').textContent = postponed;
-  document.getElementById('rejectedCard').textContent = rejected;
-  document.getElementById('avoidedMoneyCard').textContent = formatCurrency(avoidedMoney);
-}
-
-function renderHistory() {
-  const historyList = document.getElementById('historyList');
-  const decisions = getDecisions().slice(0, 6);
-  historyList.innerHTML = '';
-
-  if (!decisions.length) {
-    historyList.innerHTML = '<div class="empty-state">There are no saved decisions yet.</div>';
-    return;
-  }
-
-  const template = document.getElementById('historyItemTemplate');
-
-  decisions.forEach((item) => {
-    const node = template.content.cloneNode(true);
-    node.querySelector('.list-title').textContent = item.productName;
-    node.querySelector('.list-meta').textContent = `${formatCurrency(item.price)} · ${item.category || 'Other'} · ${formatDate(item.dateCreated)}`;
-    node.querySelector('.list-copy').textContent = item.explanation || 'No explanation available for this saved analysis.';
-    const badge = node.querySelector('.verdict-badge');
-    badge.textContent = `${item.verdict} · ${item.finalScore}`;
-    badge.classList.add(getVerdictClass(item.verdict));
-    historyList.appendChild(node);
-  });
-}
-
-function renderWishlist() {
-  const wishlistList = document.getElementById('wishlistList');
-  const items = getWishlist();
-  wishlistList.innerHTML = '';
-
-  if (!items.length) {
-    wishlistList.innerHTML = '<div class="empty-state">The wishlist is empty for now.</div>';
-    return;
-  }
-
-  const template = document.getElementById('wishlistItemTemplate');
-
-  items.forEach((item) => {
-    const node = template.content.cloneNode(true);
-    node.querySelector('.list-title').textContent = item.productName;
-    node.querySelector('.list-meta').textContent = `${formatCurrency(item.price)} · ${item.category || 'Other'}`;
-    const badge = node.querySelector('.status-badge');
-    badge.textContent = item.status;
-    badge.classList.add(item.status.toLowerCase());
-
-    node.querySelectorAll('[data-action]').forEach((button) => {
-      button.dataset.id = item.id;
-    });
-
-    wishlistList.appendChild(node);
-  });
-}
-
-function renderInsights() {
-  const decisions = getDecisions();
-  const total = decisions.length;
-  const accepted = decisions.filter((item) => item.verdict === VERDICTS.buy).length;
-  const postponed = decisions.filter((item) => item.verdict === VERDICTS.wait).length;
-  const rejected = decisions.filter((item) => item.verdict === VERDICTS.skip).length;
-  const avoidedMoney = decisions
-    .filter((item) => item.verdict !== VERDICTS.buy)
-    .reduce((sum, item) => sum + safeNumber(item.price), 0);
-
-  const rejectedByCategory = decisions
-    .filter((item) => item.verdict === VERDICTS.skip)
-    .reduce((acc, item) => {
-      const key = item.category || 'Other';
-      acc[key] = (acc[key] || 0) + 1;
-      return acc;
-    }, {});
-
-  const topRejectedCategory = Object.entries(rejectedByCategory).sort((a, b) => b[1] - a[1])[0]?.[0] || '—';
-
-  document.getElementById('insightTotal').textContent = total;
-  document.getElementById('insightAccepted').textContent = accepted;
-  document.getElementById('insightPostponed').textContent = postponed;
-  document.getElementById('insightRejected').textContent = rejected;
-  document.getElementById('insightAvoided').textContent = formatCurrency(avoidedMoney);
-  document.getElementById('topRejectedCategory').textContent = topRejectedCategory;
-
-  const buyPercent = total ? (accepted / total) * 100 : 0;
-  const waitPercent = total ? (postponed / total) * 100 : 0;
-  const skipPercent = total ? (rejected / total) * 100 : 0;
-
-  document.getElementById('buyBarValue').textContent = `${Math.round(buyPercent)}%`;
-  document.getElementById('waitBarValue').textContent = `${Math.round(waitPercent)}%`;
-  document.getElementById('skipBarValue').textContent = `${Math.round(skipPercent)}%`;
-  document.getElementById('buyBarFill').style.width = `${buyPercent}%`;
-  document.getElementById('waitBarFill').style.width = `${waitPercent}%`;
-  document.getElementById('skipBarFill').style.width = `${skipPercent}%`;
-}
-
-function refreshUI() {
-  renderDashboard();
-  renderHistory();
-  renderWishlist();
-  renderInsights();
-}
-
-function clearAllSavedData() {
-  localStorage.removeItem(STORAGE_KEYS.decisions);
-  localStorage.removeItem(STORAGE_KEYS.wishlist);
-  localStorage.removeItem(STORAGE_KEYS.profile);
-  lastAnalysis = null;
-  resetForm(false);
-  resultContent.classList.add('hidden');
-  resultEmptyState.classList.remove('hidden');
-  wishlistBtn.textContent = 'Add to wishlist';
-  refreshUI();
-}
-
-function updateRangeOutputs() {
-  document.querySelectorAll('[data-range-output]').forEach((output) => {
-    const input = document.getElementById(output.dataset.rangeOutput);
-    if (!input) return;
-    output.textContent = input.value;
-  });
-}
-
-function saveCurrentAnalysis() {
-  if (!lastAnalysis) return;
-  saveDecision(lastAnalysis);
-  refreshUI();
-}
-
-function addCurrentAnalysisToWishlist() {
-  if (!lastAnalysis) return;
-  saveWishlist({
-    id: crypto.randomUUID(),
-    productName: lastAnalysis.productName,
-    price: lastAnalysis.price,
-    category: lastAnalysis.category,
-    status: 'active',
-    dateCreated: new Date().toISOString(),
-  });
-  renderWishlist();
-}
-
-function resetForm(keepProfile = true) {
-  const profile = keepProfile ? getProfile() : {};
-  form.reset();
-  form.necessityScore.value = 5;
-  form.urgencyScore.value = 5;
-  form.frequencyScore.value = 5;
-  form.longTermValueScore.value = 5;
-  form.daysWanted.value = 3;
-  form.mood.value = 'neutral';
-
-  if (keepProfile) {
-    ['monthlyIncome', 'monthlyBudget', 'savings', 'hourlyIncome', 'mainGoalName', 'mainGoalTarget', 'mainGoalCurrent'].forEach((key) => {
-      if (profile[key] !== undefined && profile[key] !== null && profile[key] !== '') {
-        form[key].value = profile[key];
-      }
-    });
-  }
-
-  updateRangeOutputs();
-}
-
-form.addEventListener('submit', (event) => {
-  event.preventDefault();
-
-  if (!form.reportValidity()) {
-    return;
-  }
-
+purchaseForm.addEventListener('submit', e => {
+  e.preventDefault();
+  if (!purchaseForm.reportValidity()) return;
   const data = getFormData();
-  const result = evaluatePurchase(data);
-
-  persistProfileFromForm(data);
+  const result = evaluate(data);
+  writeJSON(SK.profile, {
+    monthlyIncome: data.monthlyIncome, monthlyBudget: data.monthlyBudget,
+    savings: data.savings, hourlyIncome: data.hourlyIncome,
+    mainGoalName: data.mainGoalName, mainGoalTarget: data.mainGoalTarget,
+    mainGoalCurrent: data.mainGoalCurrent,
+  });
   renderResult(result, data);
-  saveCurrentAnalysis();
+  document.getElementById('resultPanel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 });
 
-resetFormBtn.addEventListener('click', () => {
-  resetForm(true);
-  form.productName.focus();
+// Save to history — explicit, on button click
+saveHistoryBtn.addEventListener('click', () => {
+  if (!pendingResult) return;
+  saveDecision(pendingResult);
+  saveHistoryBtn.textContent = '✓ Saved';
+  saveHistoryBtn.disabled = true;
+  refreshHistoryTab();
 });
 
+// Add to wishlist — check duplicates
 wishlistBtn.addEventListener('click', () => {
-  if (!lastAnalysis) return;
-  addCurrentAnalysisToWishlist();
-  wishlistBtn.textContent = 'Added to wishlist';
-  setTimeout(() => {
-    wishlistBtn.textContent = 'Add to wishlist';
-  }, 1200);
+  if (!pendingResult) return;
+  const wl = getWishlist();
+  const isDup = wl.some(i => i.productName === pendingResult.productName && i.price === pendingResult.price);
+  if (isDup) { wishlistBtn.textContent = '✓ Already in list'; return; }
+  saveWishlistItem({ id: crypto.randomUUID(), productName: pendingResult.productName, price: pendingResult.price, category: pendingResult.category, status: 'active', dateCreated: new Date().toISOString() });
+  wishlistBtn.textContent = '✓ Added';
+  renderWishlist();
+  setTimeout(() => { wishlistBtn.textContent = t('result.wishlist'); }, 1600);
 });
 
 analyzeAnotherBtn.addEventListener('click', () => {
   resetForm(true);
-  form.productName.focus();
-  window.scrollTo({ top: document.getElementById('analyzer').offsetTop - 10, behavior: 'smooth' });
+  resultContent.classList.add('hidden');
+  resultEmpty.classList.remove('hidden');
+  pendingResult = null;
+  document.getElementById('tab-analyzer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  purchaseForm.productName.focus();
 });
 
-document.querySelectorAll('input[type="range"]').forEach((input) => {
-  input.addEventListener('input', updateRangeOutputs);
+resetFormBtn.addEventListener('click', () => { resetForm(true); purchaseForm.productName.focus(); });
+
+// ── Range outputs ─────────────────────────
+function updateAllRangeOutputs() {
+  document.querySelectorAll('[data-range-output]').forEach(span => {
+    const input = document.getElementById(span.dataset.rangeOutput);
+    if (input) span.textContent = input.value;
+  });
+}
+
+document.querySelectorAll('input[type="range"]').forEach(inp => {
+  inp.addEventListener('input', updateAllRangeOutputs);
 });
 
-document.getElementById('wishlistList').addEventListener('click', (event) => {
-  const button = event.target.closest('[data-action]');
-  if (!button) return;
+// ── Wishlist render ───────────────────────
+function renderWishlist() {
+  const container = document.getElementById('wishlistList');
+  const items     = getWishlist();
+  container.innerHTML = '';
 
-  const id = button.dataset.id;
-  const action = button.dataset.action;
-
-  if (action === 'bought') {
-    updateWishlistItem(id, { status: 'bought' });
+  if (!items.length) {
+    container.innerHTML = `<div class="empty-state">${t('empty.wishlist')}</div>`;
+    return;
   }
 
-  if (action === 'dismiss') {
-    updateWishlistItem(id, { status: 'dismissed' });
-  }
+  const tpl = document.getElementById('wishlistItemTpl');
+  items.forEach(item => {
+    const node = tpl.content.cloneNode(true);
+    node.querySelector('.wishlist-name').textContent = item.productName;
+    node.querySelector('.wishlist-meta').textContent = `${fmtCurrency(item.price)} · ${item.category || 'Other'} · ${item.status}`;
+    node.querySelectorAll('[data-action]').forEach(btn => { btn.dataset.id = item.id; });
+    container.appendChild(node);
+  });
+}
 
-  if (action === 'delete') {
-    deleteWishlistItem(id);
-  }
-
+document.getElementById('wishlistList').addEventListener('click', e => {
+  const btn = e.target.closest('[data-action]');
+  if (!btn) return;
+  const { id, action } = btn.dataset;
+  if (action === 'bought')  updateWishlistItem(id, { status: 'bought' });
+  if (action === 'dismiss') updateWishlistItem(id, { status: 'dismissed' });
+  if (action === 'delete')  deleteWishlistItem(id);
   renderWishlist();
 });
 
-resetDataBtn.addEventListener('click', () => {
-  const confirmed = window.confirm('This will permanently delete your saved decisions, wishlist and profile values. Continue?');
-  if (!confirmed) return;
-  clearAllSavedData();
-});
+// ── History tab ───────────────────────────
+function refreshHistoryTab() {
+  const decisions = getDecisions();
+  const total     = decisions.length;
+  const buy       = decisions.filter(d => d.verdictKey === 'buy').length;
+  const wait      = decisions.filter(d => d.verdictKey === 'wait').length;
+  const skip      = decisions.filter(d => d.verdictKey === 'skip').length;
+  // "avoided" = only skip (not wait — wait might still be bought)
+  const avoided   = decisions.filter(d => d.verdictKey === 'skip').reduce((s, d) => s + safeNum(d.price), 0);
+  const buyRate   = total ? Math.round((buy / total) * 100) + '%' : '—';
 
-function initApp() {
-  populateProfileFields();
-  resetForm(true);
-  refreshUI();
+  // Overview cards
+  document.getElementById('ovTotal').textContent   = total;
+  document.getElementById('ovBuy').textContent     = buy;
+  document.getElementById('ovWait').textContent    = wait;
+  document.getElementById('ovSkip').textContent    = skip;
+  document.getElementById('ovAvoided').textContent = fmtCurrency(avoided);
+
+  // Hero bar
+  document.getElementById('heroDecisions').textContent = total;
+  document.getElementById('heroAvoided').textContent   = fmtCurrency(avoided);
+  document.getElementById('heroBuyRate').textContent   = buyRate;
+
+  // Bars
+  const buyPct  = total ? (buy  / total) * 100 : 0;
+  const waitPct = total ? (wait / total) * 100 : 0;
+  const skipPct = total ? (skip / total) * 100 : 0;
+  document.getElementById('buyBar').style.width   = buyPct  + '%';
+  document.getElementById('waitBar').style.width  = waitPct + '%';
+  document.getElementById('skipBar').style.width  = skipPct + '%';
+  document.getElementById('buyPct').textContent   = Math.round(buyPct)  + '%';
+  document.getElementById('waitPct').textContent  = Math.round(waitPct) + '%';
+  document.getElementById('skipPct').textContent  = Math.round(skipPct) + '%';
+
+  // History list
+  const list = document.getElementById('historyList');
+  list.innerHTML = '';
+  if (!decisions.length) {
+    list.innerHTML = `<div class="empty-state">${t('empty.history')}</div>`;
+    return;
+  }
+  const tpl = document.getElementById('historyItemTpl');
+  decisions.slice(0, 20).forEach(item => {
+    const node = tpl.content.cloneNode(true);
+    node.querySelector('.history-name').textContent     = item.productName;
+    node.querySelector('.history-item-meta').textContent= `${fmtCurrency(item.price)} · ${item.category || 'Other'} · ${fmtDate(item.dateCreated)} · score ${item.finalScore}`;
+    node.querySelector('.history-item-exp').textContent = item.explanation || '';
+    const tag = node.querySelector('.verdict-tag');
+    tag.textContent  = t(`verdict.${item.verdictKey || (item.verdict === 'Buy' ? 'buy' : item.verdict === 'Wait' ? 'wait' : 'skip')}`);
+    tag.className    = `verdict-tag ${item.verdictKey || (item.verdict === 'Buy' ? 'buy' : item.verdict === 'Wait' ? 'wait' : 'skip')}`;
+    list.appendChild(node);
+  });
 }
 
-initApp();
+// ── Comparator ────────────────────────────
+function getCompareFormData(formEl) {
+  return {
+    productName:       formEl.querySelector('[name="productName"]').value.trim() || '—',
+    price:             safeNum(formEl.querySelector('[name="price"]').value),
+    necessityScore:    safeNum(formEl.querySelector('[name="necessityScore"]').value),
+    urgencyScore:      safeNum(formEl.querySelector('[name="urgencyScore"]').value),
+    frequencyScore:    safeNum(formEl.querySelector('[name="frequencyScore"]').value),
+    longTermValueScore:safeNum(formEl.querySelector('[name="longTermValueScore"]').value),
+    hasAlternative:    false,
+    daysWanted:        7,
+    mood:              'neutral',
+  };
+}
+
+document.getElementById('compareBtn').addEventListener('click', () => {
+  const sharedIncome  = safeNum(document.getElementById('cmpMonthlyIncome').value);
+  const sharedSavings = safeNum(document.getElementById('cmpSavings').value);
+  const sharedHourly  = safeNum(document.getElementById('cmpHourlyIncome').value);
+
+  const dA = { ...getCompareFormData(document.getElementById('compareFormA')), monthlyIncome: sharedIncome, monthlyBudget: sharedIncome, savings: sharedSavings, hourlyIncome: sharedHourly, mainGoalName: '', mainGoalTarget: 0, mainGoalCurrent: 0, reason: '' };
+  const dB = { ...getCompareFormData(document.getElementById('compareFormB')), monthlyIncome: sharedIncome, monthlyBudget: sharedIncome, savings: sharedSavings, hourlyIncome: sharedHourly, mainGoalName: '', mainGoalTarget: 0, mainGoalCurrent: 0, reason: '' };
+
+  const rA = evaluate(dA);
+  const rB = evaluate(dB);
+
+  // Render
+  const resultEl = document.getElementById('compareResult');
+  resultEl.classList.remove('hidden');
+  resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  function fillCard(prefix, data, result) {
+    document.getElementById(`compareName${prefix}`).textContent    = data.productName;
+    document.getElementById(`compareScore${prefix}`).textContent   = result.finalScore;
+    const arc = document.getElementById(`compareArc${prefix}`);
+    animateScoreRing(arc, result.finalScore, VERDICT_COLORS[result.verdictKey]);
+    const vc = document.getElementById(`compareVerdict${prefix}`);
+    vc.textContent = t(`verdict.${result.verdictKey}`);
+    vc.className   = `compare-verdict ${result.verdictKey}`;
+    const stats = document.getElementById(`compareStats${prefix}`);
+    stats.innerHTML = `
+      <span><em>${t('result.income')}</em><strong>${fmtPct(result.costVsIncomePercent)}</strong></span>
+      <span><em>${t('result.hours')}</em><strong>${fmtHours(result.hoursOfWork)}</strong></span>
+      <span><em>${t('result.impulse')}</em><strong>${t('impulse.' + result.impulseRisk)}</strong></span>
+    `;
+  }
+
+  fillCard('A', dA, rA);
+  fillCard('B', dB, rB);
+
+  // Determine winner
+  const cardA = document.getElementById('compareResultA');
+  const cardB = document.getElementById('compareResultB');
+  cardA.classList.remove('winner');
+  cardB.classList.remove('winner');
+
+  const winnerNameEl   = document.getElementById('winnerName');
+  const winnerReasonEl = document.getElementById('winnerReason');
+
+  if (rA.finalScore > rB.finalScore) {
+    cardA.classList.add('winner');
+    winnerNameEl.textContent   = dA.productName;
+    winnerReasonEl.textContent = t('compare.reason', { nameA: dA.productName, scoreA: rA.finalScore, nameB: dB.productName, scoreB: rB.finalScore, diff: rA.finalScore - rB.finalScore });
+  } else if (rB.finalScore > rA.finalScore) {
+    cardB.classList.add('winner');
+    winnerNameEl.textContent   = dB.productName;
+    winnerReasonEl.textContent = t('compare.reason', { nameA: dB.productName, scoreA: rB.finalScore, nameB: dA.productName, scoreB: rA.finalScore, diff: rB.finalScore - rA.finalScore });
+  } else {
+    winnerNameEl.textContent   = t('compare.tie');
+    winnerReasonEl.textContent = t('compare.tieReason');
+  }
+});
+
+// ── Tab navigation ────────────────────────
+document.querySelectorAll('.nav-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+    if (btn.dataset.tab === 'history') refreshHistoryTab();
+  });
+});
+
+// ── Settings modal ────────────────────────
+function openModal(overlayId) { document.getElementById(overlayId).classList.add('open'); }
+function closeModal(overlayId){ document.getElementById(overlayId).classList.remove('open'); }
+
+document.getElementById('settingsBtn').addEventListener('click', () => openModal('settingsOverlay'));
+document.getElementById('settingsClose').addEventListener('click', () => closeModal('settingsOverlay'));
+document.getElementById('settingsOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('settingsOverlay')) closeModal('settingsOverlay');
+});
+
+// Language toggle
+document.querySelectorAll('[data-lang]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentLang = btn.dataset.lang;
+    document.documentElement.setAttribute('data-lang', currentLang);
+    document.querySelectorAll('[data-lang]').forEach(b => b.classList.toggle('active', b.dataset.lang === currentLang));
+    applyTranslations();
+    refreshHistoryTab();
+    renderWishlist();
+    const s = getSettings(); s.lang = currentLang; writeJSON(SK.settings, s);
+  });
+});
+
+// Theme toggle
+document.querySelectorAll('[data-theme]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const theme = btn.dataset.theme;
+    document.documentElement.setAttribute('data-theme', theme);
+    document.querySelectorAll('[data-theme]').forEach(b => b.classList.toggle('active', b.dataset.theme === theme));
+    const s = getSettings(); s.theme = theme; writeJSON(SK.settings, s);
+  });
+});
+
+// Reset data — custom modal
+document.getElementById('resetDataBtn').addEventListener('click', () => {
+  closeModal('settingsOverlay');
+  openModal('confirmOverlay');
+});
+document.getElementById('confirmNo').addEventListener('click',  () => closeModal('confirmOverlay'));
+document.getElementById('confirmOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('confirmOverlay')) closeModal('confirmOverlay');
+});
+document.getElementById('confirmYes').addEventListener('click', () => {
+  localStorage.removeItem(SK.decisions);
+  localStorage.removeItem(SK.wishlist);
+  localStorage.removeItem(SK.profile);
+  pendingResult = null;
+  resetForm(false);
+  resultContent.classList.add('hidden');
+  resultEmpty.classList.remove('hidden');
+  closeModal('confirmOverlay');
+  refreshHistoryTab();
+  renderWishlist();
+});
+
+// ── Init ──────────────────────────────────
+function init() {
+  const settings = getSettings();
+  currentLang = settings.lang || 'en';
+  const theme = settings.theme || 'dark';
+
+  document.documentElement.setAttribute('data-lang', currentLang);
+  document.documentElement.setAttribute('data-theme', theme);
+
+  // Sync toggle buttons to stored settings
+  document.querySelectorAll('[data-lang]').forEach(b => b.classList.toggle('active', b.dataset.lang === currentLang));
+  document.querySelectorAll('[data-theme]').forEach(b => b.classList.toggle('active', b.dataset.theme === theme));
+
+  applyTranslations();
+  populateProfileFields();
+  resetForm(true);
+  refreshHistoryTab();
+  renderWishlist();
+}
+
+init();
