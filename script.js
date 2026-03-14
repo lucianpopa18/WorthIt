@@ -24,6 +24,7 @@ const resultEmptyState = document.getElementById('resultEmptyState');
 const resultContent = document.getElementById('resultContent');
 const wishlistBtn = document.getElementById('wishlistBtn');
 const analyzeAnotherBtn = document.getElementById('analyzeAnotherBtn');
+const resetDataBtn = document.getElementById('resetDataBtn');
 
 let lastAnalysis = null;
 
@@ -213,38 +214,38 @@ function generateExplanation(result, data) {
   const positives = [];
   const cautions = [];
 
-  if (data.necessityScore >= 7) positives.push('it looks like a real need');
-  if (data.frequencyScore >= 7) positives.push('you are likely to use it often');
-  if (data.longTermValueScore >= 7) positives.push('it seems to offer strong long-term value');
-  if (data.daysWanted >= 7) positives.push('you have wanted it long enough to reduce pure impulse');
-  if (result.costVsIncomePercent <= 10) positives.push('the cost is manageable relative to your monthly income');
-  if (data.reason.length >= 18) positives.push('you have a reasonably clear reason for buying it');
+  if (data.necessityScore >= 7) positives.push('pare o nevoie reală');
+  if (data.frequencyScore >= 7) positives.push('sunt șanse mari să îl folosești des');
+  if (data.longTermValueScore >= 7) positives.push('oferă valoare bună pe termen lung');
+  if (data.daysWanted >= 7) positives.push('îl vrei de suficient timp încât să nu pară doar un impuls de moment');
+  if (result.costVsIncomePercent <= 10) positives.push('costul este ușor de dus raportat la venitul tău lunar');
+  if (data.reason.length >= 18) positives.push('ai un motiv destul de clar pentru această achiziție');
 
-  if (result.costVsIncomePercent >= 30) cautions.push('it takes a heavy share of your monthly income');
-  if (result.costVsSavingsPercent >= 20) cautions.push('it cuts deeply into savings');
-  if (data.hasAlternative) cautions.push('you already have an alternative');
-  if (result.impulseRisk === IMPULSE_RISK.high) cautions.push('the context shows a strong impulse-buy signal');
-  if (data.mainGoalName && /consume|remaining/i.test(result.goalImpactText)) cautions.push('it slows down your financial goal');
-  if (data.daysWanted <= 2) cautions.push('you have wanted it for a very short time');
-  if (data.monthlyBudget > 0 && data.price > data.monthlyBudget) cautions.push('it exceeds your available monthly budget');
+  if (result.costVsIncomePercent >= 30) cautions.push('ia o parte mare din venitul lunar');
+  if (result.costVsSavingsPercent >= 20) cautions.push('taie serios din economii');
+  if (data.hasAlternative) cautions.push('ai deja o alternativă rezonabilă');
+  if (result.impulseRisk === IMPULSE_RISK.high) cautions.push('contextul arată un risc mare de cumpărare impulsivă');
+  if (data.mainGoalName && /consume|remaining/i.test(result.goalImpactText)) cautions.push('îți încetinește obiectivul financiar');
+  if (data.daysWanted <= 2) cautions.push('îl vrei de foarte puțin timp');
+  if (data.monthlyBudget > 0 && data.price > data.monthlyBudget) cautions.push('depășește bugetul lunar disponibil');
 
   const positiveSentence = positives.length
-    ? `Reasons in favor: ${positives.join(', ')}.`
-    : 'There are not enough strong signals clearly supporting the purchase.';
+    ? `Argumente pro: ${positives.join(', ')}.`
+    : 'Nu există destule semnale puternice care să susțină clar achiziția.';
 
   const cautionSentence = cautions.length
-    ? `Reasons for caution: ${cautions.join(', ')}.`
-    : 'There are no major warning signs in the current context.';
+    ? `Motive de prudență: ${cautions.join(', ')}.`
+    : 'Nu apar semnale majore de avertizare în contextul actual.';
 
   if (result.verdict === VERDICTS.buy) {
-    return `The verdict is positive. ${positiveSentence} ${cautionSentence}`;
+    return `Verdictul este favorabil. ${positiveSentence} ${cautionSentence}`;
   }
 
   if (result.verdict === VERDICTS.wait) {
-    return `The product is not a clear no, but the timing is not ideal yet. ${positiveSentence} ${cautionSentence}`;
+    return `Produsul nu este un refuz clar, dar momentul nu este ideal încă. ${positiveSentence} ${cautionSentence}`;
   }
 
-  return `Right now it is better not to buy. ${positiveSentence} ${cautionSentence}`;
+  return `Momentan este mai bine să nu cumperi. ${positiveSentence} ${cautionSentence}`;
 }
 
 function evaluatePurchase(data) {
@@ -472,6 +473,18 @@ function refreshUI() {
   renderInsights();
 }
 
+function clearAllSavedData() {
+  localStorage.removeItem(STORAGE_KEYS.decisions);
+  localStorage.removeItem(STORAGE_KEYS.wishlist);
+  localStorage.removeItem(STORAGE_KEYS.profile);
+  lastAnalysis = null;
+  resetForm(false);
+  resultContent.classList.add('hidden');
+  resultEmptyState.classList.remove('hidden');
+  wishlistBtn.textContent = 'Add to wishlist';
+  refreshUI();
+}
+
 function updateRangeOutputs() {
   document.querySelectorAll('[data-range-output]').forEach((output) => {
     const input = document.getElementById(output.dataset.rangeOutput);
@@ -579,6 +592,12 @@ document.getElementById('wishlistList').addEventListener('click', (event) => {
   }
 
   renderWishlist();
+});
+
+resetDataBtn.addEventListener('click', () => {
+  const confirmed = window.confirm('This will permanently delete your saved decisions, wishlist and profile values. Continue?');
+  if (!confirmed) return;
+  clearAllSavedData();
 });
 
 function initApp() {

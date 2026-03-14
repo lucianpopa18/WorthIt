@@ -176,6 +176,16 @@ a {
   border: 1px solid var(--line-strong);
 }
 
+.btn-danger {
+  background: rgba(212, 71, 91, 0.08);
+  color: var(--danger);
+  border: 1px solid rgba(212, 71, 91, 0.24);
+}
+
+.btn-danger:hover {
+  box-shadow: 0 10px 20px rgba(212, 71, 91, 0.12);
+}
+
 .btn-ghost {
   background: transparent;
   color: var(--muted);
