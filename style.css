@@ -284,8 +284,14 @@ h1, h2, h3, .brand-name, .card-eyebrow, .result-label, .nav-tab, .ov-lbl {
 }
 
 /* ── Form ── */
+#purchaseForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .field { display: flex; flex-direction: column; gap: 8px; }
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .field--sm { flex: 0.6; }
 .field--checkbox { justify-content: flex-end; }
 
@@ -369,7 +375,7 @@ textarea { resize: vertical; min-height: 90px; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 4px;
 }
 
 .sliders-grid--2 { margin-bottom: 0; }
