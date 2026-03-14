@@ -279,6 +279,15 @@ function applyTranslations() {
     const key = el.dataset.i18n;
     el.textContent = t(key);
   });
+  // Update all category <select> options — data-i18n doesn't work on <option> natively
+  document.querySelectorAll('select[id="category"], select[name="category"]').forEach(sel => {
+    const current = sel.value;
+    sel.querySelectorAll('option').forEach(opt => {
+      const key = 'cat.' + opt.value;
+      opt.textContent = t(key);
+    });
+    sel.value = current; // restore selection
+  });
 }
 
 // ── Storage ──────────────────────────────
