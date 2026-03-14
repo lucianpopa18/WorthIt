@@ -451,10 +451,11 @@ function populateProfileFields() {
     const el = purchaseForm[k];
     if (el && p[k] !== undefined && p[k] !== null && p[k] !== '') el.value = p[k];
   });
-  // Also fill compare financial fields
-  ['monthlyIncome','savings','hourlyIncome'].forEach(k => {
-    const el = document.getElementById('cmp' + k.charAt(0).toUpperCase() + k.slice(1));
-    if (el && p[k] !== undefined && p[k] !== '') el.value = p[k];
+  // Fill compare shared financial fields from profile
+  const cmpMap = { monthlyIncome: 'cmpMonthlyIncome', monthlyBudget: 'cmpMonthlyBudget', savings: 'cmpSavings', hourlyIncome: 'cmpHourlyIncome' };
+  Object.entries(cmpMap).forEach(([key, id]) => {
+    const el = document.getElementById(id);
+    if (el && p[key] !== undefined && p[key] !== null && p[key] !== '') el.value = p[key];
   });
 }
 
@@ -682,29 +683,42 @@ function refreshHistoryTab() {
 // ── Comparator ────────────────────────────
 function getCompareFormData(formEl) {
   return {
-    productName:       formEl.querySelector('[name="productName"]').value.trim() || '—',
-    price:             safeNum(formEl.querySelector('[name="price"]').value),
-    necessityScore:    safeNum(formEl.querySelector('[name="necessityScore"]').value),
-    urgencyScore:      safeNum(formEl.querySelector('[name="urgencyScore"]').value),
-    frequencyScore:    safeNum(formEl.querySelector('[name="frequencyScore"]').value),
-    longTermValueScore:safeNum(formEl.querySelector('[name="longTermValueScore"]').value),
-    hasAlternative:    false,
-    daysWanted:        7,
-    mood:              'neutral',
-    reason:            '',
-    mainGoalName:      '',
-    mainGoalTarget:    0,
-    mainGoalCurrent:   0,
+    productName:        formEl.querySelector('[name="productName"]').value.trim() || '—',
+    price:              safeNum(formEl.querySelector('[name="price"]').value),
+    daysWanted:         safeNum(formEl.querySelector('[name="daysWanted"]').value),
+    necessityScore:     safeNum(formEl.querySelector('[name="necessityScore"]').value),
+    urgencyScore:       safeNum(formEl.querySelector('[name="urgencyScore"]').value),
+    frequencyScore:     safeNum(formEl.querySelector('[name="frequencyScore"]').value),
+    longTermValueScore: safeNum(formEl.querySelector('[name="longTermValueScore"]').value),
+    hasAlternative:     false,
+    mood:               'neutral',
+    reason:             '',
+    mainGoalName:       '',
+    mainGoalTarget:     0,
+    mainGoalCurrent:    0,
   };
 }
 
 document.getElementById('compareBtn').addEventListener('click', () => {
   const sharedIncome  = safeNum(document.getElementById('cmpMonthlyIncome').value);
+  const sharedBudget  = safeNum(document.getElementById('cmpMonthlyBudget').value);
   const sharedSavings = safeNum(document.getElementById('cmpSavings').value);
   const sharedHourly  = safeNum(document.getElementById('cmpHourlyIncome').value);
 
-  const dA = { ...getCompareFormData(document.getElementById('compareFormA')), monthlyIncome: sharedIncome, monthlyBudget: sharedIncome, savings: sharedSavings, hourlyIncome: sharedHourly };
-  const dB = { ...getCompareFormData(document.getElementById('compareFormB')), monthlyIncome: sharedIncome, monthlyBudget: sharedIncome, savings: sharedSavings, hourlyIncome: sharedHourly };
+  const dA = {
+    ...getCompareFormData(document.getElementById('compareFormA')),
+    monthlyIncome: sharedIncome,
+    monthlyBudget: sharedBudget || sharedIncome,
+    savings:       sharedSavings,
+    hourlyIncome:  sharedHourly,
+  };
+  const dB = {
+    ...getCompareFormData(document.getElementById('compareFormB')),
+    monthlyIncome: sharedIncome,
+    monthlyBudget: sharedBudget || sharedIncome,
+    savings:       sharedSavings,
+    hourlyIncome:  sharedHourly,
+  };
 
   const rA = evaluate(dA);
   const rB = evaluate(dB);
