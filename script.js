@@ -12,6 +12,7 @@ const TRANSLATIONS = {
     'nav.analyze': 'Analyze',
     'nav.compare': 'Compare',
     'nav.history': 'History',
+    'nav.settings': 'Settings',
     'settings.title': 'Settings',
     'settings.language': 'Language',
     'settings.theme': 'Theme',
@@ -123,6 +124,7 @@ const TRANSLATIONS = {
     'nav.analyze': 'Analiză',
     'nav.compare': 'Comparare',
     'nav.history': 'Istoric',
+    'nav.settings': 'Setări',
     'settings.title': 'Setări',
     'settings.language': 'Limbă',
     'settings.theme': 'Temă',
@@ -687,6 +689,10 @@ function getCompareFormData(formEl) {
     hasAlternative:    false,
     daysWanted:        7,
     mood:              'neutral',
+    reason:            '',
+    mainGoalName:      '',
+    mainGoalTarget:    0,
+    mainGoalCurrent:   0,
   };
 }
 
@@ -695,8 +701,8 @@ document.getElementById('compareBtn').addEventListener('click', () => {
   const sharedSavings = safeNum(document.getElementById('cmpSavings').value);
   const sharedHourly  = safeNum(document.getElementById('cmpHourlyIncome').value);
 
-  const dA = { ...getCompareFormData(document.getElementById('compareFormA')), monthlyIncome: sharedIncome, monthlyBudget: sharedIncome, savings: sharedSavings, hourlyIncome: sharedHourly, mainGoalName: '', mainGoalTarget: 0, mainGoalCurrent: 0, reason: '' };
-  const dB = { ...getCompareFormData(document.getElementById('compareFormB')), monthlyIncome: sharedIncome, monthlyBudget: sharedIncome, savings: sharedSavings, hourlyIncome: sharedHourly, mainGoalName: '', mainGoalTarget: 0, mainGoalCurrent: 0, reason: '' };
+  const dA = { ...getCompareFormData(document.getElementById('compareFormA')), monthlyIncome: sharedIncome, monthlyBudget: sharedIncome, savings: sharedSavings, hourlyIncome: sharedHourly };
+  const dB = { ...getCompareFormData(document.getElementById('compareFormB')), monthlyIncome: sharedIncome, monthlyBudget: sharedIncome, savings: sharedSavings, hourlyIncome: sharedHourly };
 
   const rA = evaluate(dA);
   const rB = evaluate(dB);
@@ -749,9 +755,9 @@ document.getElementById('compareBtn').addEventListener('click', () => {
 });
 
 // ── Tab navigation ────────────────────────
-document.querySelectorAll('.nav-tab').forEach(btn => {
+document.querySelectorAll('.nav-tab:not(.nav-tab--settings)').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.nav-tab:not(.nav-tab--settings)').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');

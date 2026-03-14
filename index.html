@@ -70,10 +70,11 @@
       <button class="nav-tab active" data-tab="analyzer" data-i18n="nav.analyze">Analyze</button>
       <button class="nav-tab" data-tab="compare" data-i18n="nav.compare">Compare</button>
       <button class="nav-tab" data-tab="history" data-i18n="nav.history">History</button>
+      <button class="nav-tab nav-tab--settings" id="settingsBtn" data-i18n="nav.settings">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <span data-i18n="nav.settings">Settings</span>
+      </button>
     </div>
-    <button class="nav-settings" id="settingsBtn" aria-label="Settings">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 1 0 4.93 19.07"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-    </button>
   </nav>
 
   <!-- ═══ TAB: ANALYZER ═══ -->
@@ -347,17 +348,20 @@
       <!-- Product A -->
       <div class="compare-col">
         <div class="card compare-card" id="compareCardA">
-          <div class="compare-label label-a">A</div>
+          <div class="compare-card-header">
+            <div class="compare-label label-a">A</div>
+            <span class="compare-card-title">Product A</span>
+          </div>
           <form class="compare-form" id="compareFormA" novalidate>
             <div class="field">
               <label data-i18n="form.name">Product name</label>
               <input name="productName" type="text" placeholder="Product A" required />
             </div>
-            <div class="field">
+            <div class="field" style="margin-top:12px">
               <label data-i18n="form.price">Price (EUR)</label>
               <input name="price" type="number" min="0" step="0.01" placeholder="0" required />
             </div>
-            <div class="sliders-grid sliders-grid--2">
+            <div class="sliders-grid sliders-grid--2" style="margin-top:16px">
               <div class="slider-card">
                 <div class="slider-top"><span data-i18n="slider.necessity">Necessity</span><span class="slider-val" data-range-output="necessityScoreA">5</span></div>
                 <input name="necessityScore" id="necessityScoreA" type="range" min="1" max="10" value="5" />
@@ -387,17 +391,20 @@
       <!-- Product B -->
       <div class="compare-col">
         <div class="card compare-card" id="compareCardB">
-          <div class="compare-label label-b">B</div>
+          <div class="compare-card-header">
+            <div class="compare-label label-b">B</div>
+            <span class="compare-card-title">Product B</span>
+          </div>
           <form class="compare-form" id="compareFormB" novalidate>
             <div class="field">
               <label data-i18n="form.name">Product name</label>
               <input name="productName" type="text" placeholder="Product B" required />
             </div>
-            <div class="field">
+            <div class="field" style="margin-top:12px">
               <label data-i18n="form.price">Price (EUR)</label>
               <input name="price" type="number" min="0" step="0.01" placeholder="0" required />
             </div>
-            <div class="sliders-grid sliders-grid--2">
+            <div class="sliders-grid sliders-grid--2" style="margin-top:16px">
               <div class="slider-card">
                 <div class="slider-top"><span data-i18n="slider.necessity">Necessity</span><span class="slider-val" data-range-output="necessityScoreB">5</span></div>
                 <input name="necessityScore" id="necessityScoreB" type="range" min="1" max="10" value="5" />
@@ -407,8 +414,8 @@
                 <input name="frequencyScore" id="frequencyScoreB" type="range" min="1" max="10" value="5" />
               </div>
               <div class="slider-card">
-                <div class="slider-top"><span data-i18n="slider.urgency">Urgency</span><span class="slider-val" data-range-output="urgencyScoreA2">5</span></div>
-                <input name="urgencyScore" id="urgencyScoreA2" type="range" min="1" max="10" value="5" />
+                <div class="slider-top"><span data-i18n="slider.urgency">Urgency</span><span class="slider-val" data-range-output="urgencyScoreB">5</span></div>
+                <input name="urgencyScore" id="urgencyScoreB" type="range" min="1" max="10" value="5" />
               </div>
               <div class="slider-card">
                 <div class="slider-top"><span data-i18n="slider.longterm">Long-term</span><span class="slider-val" data-range-output="longTermValueScoreB">5</span></div>
