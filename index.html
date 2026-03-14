@@ -13,33 +13,60 @@
 <body>
   <div class="app-shell">
     <header class="hero section">
-      <div class="hero-copy">
-        <span class="eyebrow">Decision Helper pentru cumpărături</span>
+      <div class="hero-copy card glass-card">
+        <span class="eyebrow" data-i18n="heroEyebrow">Decision Helper pentru cumpărături</span>
         <h1>WorthIt</h1>
-        <p class="hero-subtitle">
+        <p class="hero-subtitle" data-i18n="heroSubtitle">
           Analizează fiecare achiziție prin filtrul nevoii reale, al impactului financiar și al riscului de impuls.
         </p>
+
+        <div class="settings-strip">
+          <div class="settings-grid">
+            <label class="setting-field" for="languageSelect">
+              <span data-i18n="languageLabel">Limbă</span>
+              <select id="languageSelect" aria-label="Language">
+                <option value="ro">Română</option>
+                <option value="en">English</option>
+              </select>
+            </label>
+
+            <label class="setting-field" for="currencySelect">
+              <span data-i18n="currencyLabel">Monedă</span>
+              <select id="currencySelect" aria-label="Currency">
+                <option value="RON">RON · Leu</option>
+                <option value="EUR">EUR · Euro</option>
+                <option value="USD">USD · Dollar</option>
+                <option value="GBP">GBP · Pound</option>
+              </select>
+            </label>
+          </div>
+          <p class="settings-note" data-i18n="settingsNote">
+            Toate sumele din formular, dashboard și istoric folosesc moneda selectată.
+          </p>
+        </div>
+
         <div class="hero-actions">
-          <button class="btn btn-primary" id="startAnalysisBtn">Analizează o cumpărătură</button>
-          <a class="btn btn-secondary" href="#dashboard">Vezi dashboard</a>
+          <button class="btn btn-primary" id="startAnalysisBtn" data-i18n="analyzePurchaseBtn">Analizează o cumpărătură</button>
+          <a class="btn btn-secondary" href="#dashboard" data-i18n="seeDashboardBtn">Vezi dashboard</a>
         </div>
       </div>
+
       <div class="hero-panel card glass-card">
         <div class="hero-panel-head">
           <span class="status-dot"></span>
-          <span>Decizie mai lucidă, mai puțin impuls</span>
+          <span data-i18n="heroPanelTitle">Decizie mai lucidă, mai puțin impuls</span>
         </div>
         <div class="hero-metrics">
           <div>
             <strong id="heroMetricScore">0</strong>
-            <span>analize salvate</span>
+            <span data-i18n="analysesSaved">analize salvate</span>
           </div>
           <div>
             <strong id="heroMetricSavings">0 lei</strong>
-            <span>bani evitați estimat</span>
+            <span data-i18n="avoidedEstimated">bani evitați estimat</span>
           </div>
         </div>
-        <p class="hero-note">
+        <p class="hero-note" data-i18n="heroNote">
           Un MVP local, fără backend, cu logică deterministică și date păstrate în browser.
         </p>
       </div>
@@ -49,30 +76,30 @@
       <section id="dashboard" class="section">
         <div class="section-heading">
           <div>
-            <span class="eyebrow">Dashboard</span>
-            <h2>Privire rapidă</h2>
+            <span class="eyebrow" data-i18n="dashboardEyebrow">Dashboard</span>
+            <h2 data-i18n="dashboardTitle">Privire rapidă</h2>
           </div>
         </div>
 
         <div class="overview-grid" id="overviewGrid">
           <article class="overview-card card">
-            <span class="overview-label">Total analize</span>
+            <span class="overview-label" data-i18n="totalAnalyses">Total analize</span>
             <strong class="overview-value" id="totalDecisionsCard">0</strong>
           </article>
           <article class="overview-card card">
-            <span class="overview-label">Cumpărături acceptate</span>
+            <span class="overview-label" data-i18n="acceptedPurchases">Cumpărături acceptate</span>
             <strong class="overview-value" id="acceptedCard">0</strong>
           </article>
           <article class="overview-card card">
-            <span class="overview-label">Cumpărături amânate</span>
+            <span class="overview-label" data-i18n="postponedPurchases">Cumpărături amânate</span>
             <strong class="overview-value" id="postponedCard">0</strong>
           </article>
           <article class="overview-card card">
-            <span class="overview-label">Cumpărături respinse</span>
+            <span class="overview-label" data-i18n="rejectedPurchases">Cumpărături respinse</span>
             <strong class="overview-value" id="rejectedCard">0</strong>
           </article>
           <article class="overview-card card highlight-card">
-            <span class="overview-label">Bani evitați</span>
+            <span class="overview-label" data-i18n="moneyAvoided">Bani evitați</span>
             <strong class="overview-value" id="avoidedMoneyCard">0 lei</strong>
           </article>
         </div>
@@ -80,16 +107,16 @@
         <div class="dashboard-grid">
           <section class="panel card">
             <div class="panel-header">
-              <h3>Ultimele decizii</h3>
-              <span class="panel-caption">Cele mai recente analize</span>
+              <h3 data-i18n="recentDecisions">Ultimele decizii</h3>
+              <span class="panel-caption" data-i18n="recentAnalyses">Cele mai recente analize</span>
             </div>
             <div id="historyList" class="stack-list"></div>
           </section>
 
           <section class="panel card">
             <div class="panel-header">
-              <h3>Wishlist</h3>
-              <span class="panel-caption">Produse salvate pentru mai târziu</span>
+              <h3 data-i18n="wishlistTitle">Wishlist</h3>
+              <span class="panel-caption" data-i18n="wishlistCaption">Produse salvate pentru mai târziu</span>
             </div>
             <div id="wishlistList" class="stack-list"></div>
           </section>
@@ -99,61 +126,61 @@
       <section id="insights" class="section">
         <div class="section-heading">
           <div>
-            <span class="eyebrow">Insights</span>
-            <h2>Ce spun deciziile tale</h2>
+            <span class="eyebrow" data-i18n="insightsEyebrow">Insights</span>
+            <h2 data-i18n="insightsTitle">Ce spun deciziile tale</h2>
           </div>
         </div>
 
         <div class="insights-grid">
           <article class="card insight-summary">
             <div class="insight-row">
-              <span>Total decizii</span>
+              <span data-i18n="totalDecisions">Total decizii</span>
               <strong id="insightTotal">0</strong>
             </div>
             <div class="insight-row">
-              <span>Acceptate</span>
+              <span data-i18n="accepted">Acceptate</span>
               <strong id="insightAccepted">0</strong>
             </div>
             <div class="insight-row">
-              <span>Amânate</span>
+              <span data-i18n="postponed">Amânate</span>
               <strong id="insightPostponed">0</strong>
             </div>
             <div class="insight-row">
-              <span>Respinse</span>
+              <span data-i18n="rejected">Respinse</span>
               <strong id="insightRejected">0</strong>
             </div>
             <div class="insight-row">
-              <span>Bani evitați estimat</span>
+              <span data-i18n="avoidedEstimated">Bani evitați estimat</span>
               <strong id="insightAvoided">0 lei</strong>
             </div>
             <div class="insight-row">
-              <span>Categoria cu cele mai multe respingeri</span>
+              <span data-i18n="topRejectedCategoryLabel">Categoria cu cele mai multe respingeri</span>
               <strong id="topRejectedCategory">—</strong>
             </div>
           </article>
 
           <article class="card decision-bars-card">
             <div class="panel-header compact">
-              <h3>Distribuția verdictelor</h3>
+              <h3 data-i18n="verdictDistribution">Distribuția verdictelor</h3>
             </div>
             <div class="decision-bars">
               <div class="bar-block">
                 <div class="bar-meta">
-                  <span>Cumpără</span>
+                  <span data-i18n="buyVerdict">Cumpără</span>
                   <strong id="buyBarValue">0%</strong>
                 </div>
                 <div class="bar-track"><span class="bar-fill is-positive" id="buyBarFill"></span></div>
               </div>
               <div class="bar-block">
                 <div class="bar-meta">
-                  <span>Mai așteaptă</span>
+                  <span data-i18n="waitVerdict">Mai așteaptă</span>
                   <strong id="waitBarValue">0%</strong>
                 </div>
                 <div class="bar-track"><span class="bar-fill is-warning" id="waitBarFill"></span></div>
               </div>
               <div class="bar-block">
                 <div class="bar-meta">
-                  <span>Nu cumpăra acum</span>
+                  <span data-i18n="skipVerdict">Nu cumpăra acum</span>
                   <strong id="skipBarValue">0%</strong>
                 </div>
                 <div class="bar-track"><span class="bar-fill is-danger" id="skipBarFill"></span></div>
@@ -166,8 +193,8 @@
       <section id="analyzer" class="section">
         <div class="section-heading">
           <div>
-            <span class="eyebrow">Analiză</span>
-            <h2>Analizează o cumpărătură</h2>
+            <span class="eyebrow" data-i18n="analysisEyebrow">Analiză</span>
+            <h2 data-i18n="analysisTitle">Analizează o cumpărătură</h2>
           </div>
         </div>
 
@@ -176,64 +203,64 @@
             <form id="purchaseForm" class="purchase-form" novalidate>
               <div class="form-grid two-columns">
                 <div class="field-group">
-                  <label for="productName">Nume produs</label>
-                  <input id="productName" name="productName" type="text" placeholder="ex: Căști noise cancelling" required />
+                  <label for="productName" data-i18n="productNameLabel">Nume produs</label>
+                  <input id="productName" name="productName" type="text" data-i18n-placeholder="productNamePlaceholder" placeholder="ex: Căști noise cancelling" required />
                 </div>
 
                 <div class="field-group">
-                  <label for="price">Preț</label>
+                  <label for="price" data-i18n="priceLabel">Preț</label>
                   <input id="price" name="price" type="number" min="0" step="0.01" placeholder="0" required />
                 </div>
 
                 <div class="field-group">
-                  <label for="category">Categorie</label>
+                  <label for="category" data-i18n="categoryLabel">Categorie</label>
                   <select id="category" name="category" required>
-                    <option value="">Selectează</option>
-                    <option>Electronice</option>
-                    <option>Casă</option>
-                    <option>Îmbrăcăminte</option>
-                    <option>Educație</option>
-                    <option>Sănătate</option>
-                    <option>Hobby</option>
-                    <option>Călătorii</option>
-                    <option>Cadouri</option>
-                    <option>Altceva</option>
+                    <option value="" data-i18n="selectOption">Selectează</option>
+                    <option value="electronics" data-i18n="category.electronics">Electronice</option>
+                    <option value="home" data-i18n="category.home">Casă</option>
+                    <option value="clothing" data-i18n="category.clothing">Îmbrăcăminte</option>
+                    <option value="education" data-i18n="category.education">Educație</option>
+                    <option value="health" data-i18n="category.health">Sănătate</option>
+                    <option value="hobby" data-i18n="category.hobby">Hobby</option>
+                    <option value="travel" data-i18n="category.travel">Călătorii</option>
+                    <option value="gifts" data-i18n="category.gifts">Cadouri</option>
+                    <option value="other" data-i18n="category.other">Altceva</option>
                   </select>
                 </div>
 
                 <div class="field-group field-group-wide">
-                  <label for="reason">De ce vrei să îl cumperi?</label>
-                  <textarea id="reason" name="reason" rows="4" placeholder="Scrie motivul principal" required></textarea>
+                  <label for="reason" data-i18n="reasonLabel">De ce vrei să îl cumperi?</label>
+                  <textarea id="reason" name="reason" rows="4" data-i18n-placeholder="reasonPlaceholder" placeholder="Scrie motivul principal" required></textarea>
                 </div>
               </div>
 
               <div class="form-section">
                 <div class="form-section-head">
-                  <h3>Scoruri comportamentale</h3>
-                  <span>1 = foarte mic, 10 = foarte mare</span>
+                  <h3 data-i18n="behavioralScoresTitle">Scoruri comportamentale</h3>
+                  <span data-i18n="scoresLegend">1 = foarte mic, 10 = foarte mare</span>
                 </div>
                 <div class="slider-grid">
                   <div class="range-card">
-                    <label for="necessityScore">Necesitate</label>
-                    <div class="range-header"><span>Cât de necesar este?</span><strong id="necessityScoreOutput">5</strong></div>
+                    <label for="necessityScore" data-i18n="necessityLabel">Necesitate</label>
+                    <div class="range-header"><span data-i18n="necessityHint">Cât de necesar este?</span><strong id="necessityScoreOutput">5</strong></div>
                     <input id="necessityScore" name="necessityScore" type="range" min="1" max="10" value="5" />
                   </div>
 
                   <div class="range-card">
-                    <label for="urgencyScore">Urgență</label>
-                    <div class="range-header"><span>Cât de urgent este acum?</span><strong id="urgencyScoreOutput">5</strong></div>
+                    <label for="urgencyScore" data-i18n="urgencyLabel">Urgență</label>
+                    <div class="range-header"><span data-i18n="urgencyHint">Cât de urgent este acum?</span><strong id="urgencyScoreOutput">5</strong></div>
                     <input id="urgencyScore" name="urgencyScore" type="range" min="1" max="10" value="5" />
                   </div>
 
                   <div class="range-card">
-                    <label for="frequencyScore">Frecvență</label>
-                    <div class="range-header"><span>Cât de des îl vei folosi?</span><strong id="frequencyScoreOutput">5</strong></div>
+                    <label for="frequencyScore" data-i18n="frequencyLabel">Frecvență</label>
+                    <div class="range-header"><span data-i18n="frequencyHint">Cât de des îl vei folosi?</span><strong id="frequencyScoreOutput">5</strong></div>
                     <input id="frequencyScore" name="frequencyScore" type="range" min="1" max="10" value="5" />
                   </div>
 
                   <div class="range-card">
-                    <label for="longTermValueScore">Valoare pe termen lung</label>
-                    <div class="range-header"><span>Câtă valoare aduce în timp?</span><strong id="longTermValueScoreOutput">5</strong></div>
+                    <label for="longTermValueScore" data-i18n="longTermValueLabel">Valoare pe termen lung</label>
+                    <div class="range-header"><span data-i18n="longTermValueHint">Câtă valoare aduce în timp?</span><strong id="longTermValueScoreOutput">5</strong></div>
                     <input id="longTermValueScore" name="longTermValueScore" type="range" min="1" max="10" value="5" />
                   </div>
                 </div>
@@ -243,125 +270,127 @@
                 <div class="field-group checkbox-group card subtle-card">
                   <label class="checkbox-label" for="hasAlternative">
                     <input id="hasAlternative" name="hasAlternative" type="checkbox" />
-                    <span>Am deja o alternativă rezonabilă</span>
+                    <span data-i18n="hasAlternativeLabel">Am deja o alternativă rezonabilă</span>
                   </label>
                 </div>
 
                 <div class="field-group">
-                  <label for="daysWanted">De câte zile îl vrei?</label>
+                  <label for="daysWanted" data-i18n="daysWantedLabel">De câte zile îl vrei?</label>
                   <input id="daysWanted" name="daysWanted" type="number" min="0" step="1" placeholder="0" required />
                 </div>
 
                 <div class="field-group">
-                  <label for="mood">Stare curentă</label>
+                  <label for="mood" data-i18n="moodLabel">Stare curentă</label>
                   <select id="mood" name="mood" required>
-                    <option value="neutral">neutral</option>
-                    <option value="calm">calm</option>
-                    <option value="stressed">stressed</option>
-                    <option value="bored">bored</option>
-                    <option value="excited">excited</option>
-                    <option value="sad">sad</option>
+                    <option value="neutral" data-i18n="mood.neutral">neutral</option>
+                    <option value="calm" data-i18n="mood.calm">calm</option>
+                    <option value="stressed" data-i18n="mood.stressed">stressed</option>
+                    <option value="bored" data-i18n="mood.bored">bored</option>
+                    <option value="excited" data-i18n="mood.excited">excited</option>
+                    <option value="sad" data-i18n="mood.sad">sad</option>
                   </select>
                 </div>
               </div>
 
               <div class="form-section">
                 <div class="form-section-head">
-                  <h3>Context financiar</h3>
-                  <span>Datele se păstrează local în browser</span>
+                  <h3 data-i18n="financialContextTitle">Context financiar</h3>
+                  <span data-i18n="financialContextHint">Datele se păstrează local în browser</span>
                 </div>
                 <div class="form-grid three-columns">
                   <div class="field-group">
-                    <label for="monthlyIncome">Venit lunar</label>
+                    <label for="monthlyIncome" data-i18n="monthlyIncomeLabel">Venit lunar</label>
                     <input id="monthlyIncome" name="monthlyIncome" data-profile="monthlyIncome" type="number" min="0" step="0.01" placeholder="0" required />
                   </div>
 
                   <div class="field-group">
-                    <label for="monthlyBudget">Buget lunar disponibil</label>
+                    <label for="monthlyBudget" data-i18n="monthlyBudgetLabel">Buget lunar disponibil</label>
                     <input id="monthlyBudget" name="monthlyBudget" data-profile="monthlyBudget" type="number" min="0" step="0.01" placeholder="0" required />
                   </div>
 
                   <div class="field-group">
-                    <label for="savings">Economii</label>
+                    <label for="savings" data-i18n="savingsLabel">Economii</label>
                     <input id="savings" name="savings" data-profile="savings" type="number" min="0" step="0.01" placeholder="0" required />
                   </div>
 
                   <div class="field-group">
-                    <label for="hourlyIncome">Venit pe oră</label>
+                    <label for="hourlyIncome" data-i18n="hourlyIncomeLabel">Venit pe oră</label>
                     <input id="hourlyIncome" name="hourlyIncome" data-profile="hourlyIncome" type="number" min="0" step="0.01" placeholder="0" required />
                   </div>
 
                   <div class="field-group">
-                    <label for="mainGoalName">Obiectiv financiar principal</label>
-                    <input id="mainGoalName" name="mainGoalName" data-profile="mainGoalName" type="text" placeholder="ex: Fond de urgență" required />
+                    <label for="mainGoalName" data-i18n="mainGoalNameLabel">Obiectiv financiar principal</label>
+                    <input id="mainGoalName" name="mainGoalName" data-profile="mainGoalName" type="text" data-i18n-placeholder="mainGoalNamePlaceholder" placeholder="ex: Fond de urgență" required />
                   </div>
 
                   <div class="field-group">
-                    <label for="mainGoalTarget">Ținta obiectivului</label>
+                    <label for="mainGoalTarget" data-i18n="mainGoalTargetLabel">Ținta obiectivului</label>
                     <input id="mainGoalTarget" name="mainGoalTarget" data-profile="mainGoalTarget" type="number" min="0" step="0.01" placeholder="0" required />
                   </div>
 
                   <div class="field-group">
-                    <label for="mainGoalCurrent">Progres curent (opțional)</label>
+                    <label for="mainGoalCurrent" data-i18n="mainGoalCurrentLabel">Progres curent (opțional)</label>
                     <input id="mainGoalCurrent" name="mainGoalCurrent" data-profile="mainGoalCurrent" type="number" min="0" step="0.01" placeholder="0" />
                   </div>
                 </div>
               </div>
 
               <div class="form-actions">
-                <button class="btn btn-primary" type="submit">Calculează verdictul</button>
-                <button class="btn btn-ghost" type="button" id="resetFormBtn">Resetează formularul</button>
+                <button class="btn btn-primary" type="submit" data-i18n="calculateVerdictBtn">Calculează verdictul</button>
+                <button class="btn btn-ghost" type="button" id="resetFormBtn" data-i18n="resetFormBtn">Resetează formularul</button>
               </div>
             </form>
           </section>
 
           <aside class="card result-panel" id="resultPanel">
             <div id="resultEmptyState" class="result-empty">
-              <span class="result-empty-icon">◎</span>
-              <h3>Rezultatul analizei apare aici</h3>
-              <p>
-                Completează formularul și vei primi un scor final, un verdict clar și un rezumat al impactului financiar.
-              </p>
+              <div>
+                <span class="result-empty-icon">◎</span>
+                <h3 data-i18n="resultEmptyTitle">Rezultatul analizei apare aici</h3>
+                <p data-i18n="resultEmptyText">
+                  Completează formularul și vei primi un scor final, un verdict clar și un rezumat al impactului financiar.
+                </p>
+              </div>
             </div>
 
             <div id="resultContent" class="result-content hidden">
               <div class="result-top">
                 <div>
-                  <span class="eyebrow">Scor final</span>
+                  <span class="eyebrow" data-i18n="finalScoreLabel">Scor final</span>
                   <div class="score-display" id="finalScoreDisplay">0</div>
                 </div>
                 <div class="verdict-box" id="verdictBox">
-                  <span>Verdict</span>
+                  <span data-i18n="verdictLabel">Verdict</span>
                   <strong id="verdictText">—</strong>
                 </div>
               </div>
 
               <div class="result-block card subtle-card">
                 <div class="block-head">
-                  <h3>Explicație</h3>
+                  <h3 data-i18n="explanationLabel">Explicație</h3>
                 </div>
                 <p id="explanationText"></p>
               </div>
 
               <div class="result-block">
                 <div class="block-head">
-                  <h3>Impact financiar</h3>
+                  <h3 data-i18n="financialImpactLabel">Impact financiar</h3>
                 </div>
                 <div class="impact-grid">
                   <article class="impact-card card subtle-card">
-                    <span>% din venitul lunar</span>
+                    <span data-i18n="incomePercentLabel">% din venitul lunar</span>
                     <strong id="costIncomeText">0%</strong>
                   </article>
                   <article class="impact-card card subtle-card">
-                    <span>% din economii</span>
+                    <span data-i18n="savingsPercentLabel">% din economii</span>
                     <strong id="costSavingsText">0%</strong>
                   </article>
                   <article class="impact-card card subtle-card">
-                    <span>Ore de muncă necesare</span>
+                    <span data-i18n="hoursOfWorkLabel">Ore de muncă necesare</span>
                     <strong id="hoursWorkText">0h</strong>
                   </article>
                   <article class="impact-card card subtle-card">
-                    <span>Impact asupra obiectivului</span>
+                    <span data-i18n="goalImpactLabel">Impact asupra obiectivului</span>
                     <strong id="goalImpactText">—</strong>
                   </article>
                 </div>
@@ -369,7 +398,7 @@
 
               <div class="result-block card subtle-card">
                 <div class="block-head">
-                  <h3>Risc de impuls</h3>
+                  <h3 data-i18n="impulseRiskLabel">Risc de impuls</h3>
                 </div>
                 <div class="impulse-line">
                   <span id="impulseRiskBadge" class="risk-badge">—</span>
@@ -378,8 +407,8 @@
               </div>
 
               <div class="result-actions">
-                <button class="btn btn-secondary" type="button" id="addToWishlistBtn">Pune în wishlist</button>
-                <button class="btn btn-primary" type="button" id="analyzeAnotherBtn">Analizează alt produs</button>
+                <button class="btn btn-secondary" type="button" id="addToWishlistBtn" data-i18n="addToWishlistBtn">Pune în wishlist</button>
+                <button class="btn btn-primary" type="button" id="analyzeAnotherBtn" data-i18n="analyzeAnotherBtn">Analizează alt produs</button>
               </div>
             </div>
           </aside>
@@ -399,8 +428,8 @@
       </div>
       <div class="item-card-body">
         <div class="mini-stats">
-          <span class="mini-stat">Scor: <strong class="history-score"></strong></span>
-          <span class="mini-stat">Risc impuls: <strong class="history-risk"></strong></span>
+          <span class="mini-stat"><span data-mini-label="score"></span> <strong class="history-score"></strong></span>
+          <span class="mini-stat"><span data-mini-label="risk"></span> <strong class="history-risk"></strong></span>
         </div>
         <p class="item-description"></p>
       </div>
