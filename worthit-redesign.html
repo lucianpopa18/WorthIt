@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WorthIt — Premium SaaS Redesign</title>
+  <meta name="description" content="WorthIt helps you decide whether a purchase is actually worth it with a premium modern SaaS-style interface." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="worthit-redesign.css" />
+</head>
+<body>
+  <div class="site-shell">
+    <header class="topbar">
+      <a class="brand" href="#top">
+        <span class="brand-mark">W</span>
+        <span>WorthIt</span>
+      </a>
+
+      <nav class="topnav">
+        <a href="#calculator">Calculator</a>
+        <a href="#features">Features</a>
+        <a href="#about">About</a>
+        <a href="https://github.com/" target="_blank" rel="noreferrer">GitHub</a>
+      </nav>
+
+      <a class="nav-cta" href="#calculator">Try it now</a>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow">Smarter purchase decisions</div>
+          <h1>Turn impulse buys into confident decisions.</h1>
+          <p class="hero-subtitle">
+            WorthIt helps you evaluate purchases with context, not gut feeling — combining price,
+            urgency, financial impact, and long-term value into one clear verdict.
+          </p>
+
+          <div class="hero-actions">
+            <a class="button button-primary" href="#calculator">Start a quick analysis</a>
+            <a class="button button-secondary" href="#features">See how it works</a>
+          </div>
+
+          <div class="hero-proof">
+            <div class="proof-card">
+              <span class="proof-value" id="heroAnalyses">0</span>
+              <span class="proof-label">analyses saved</span>
+            </div>
+            <div class="proof-card">
+              <span class="proof-value" id="heroAvoided">€0</span>
+              <span class="proof-label">money avoided</span>
+            </div>
+            <div class="proof-card">
+              <span class="proof-value" id="heroBuyRate">—</span>
+              <span class="proof-label">buy rate</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="hero-orb hero-orb-a"></div>
+          <div class="hero-orb hero-orb-b"></div>
+          <div class="dashboard-preview glass-panel">
+            <div class="preview-header">
+              <div>
+                <span class="preview-kicker">Decision engine</span>
+                <strong>WorthIt Score</strong>
+              </div>
+              <span class="status-chip status-chip-live">Live</span>
+            </div>
+
+            <div class="preview-score-ring">
+              <div class="preview-score-core">
+                <span>84</span>
+                <small>score</small>
+              </div>
+            </div>
+
+            <div class="preview-grid">
+              <div class="mini-stat">
+                <span>Impulse risk</span>
+                <strong>Low</strong>
+              </div>
+              <div class="mini-stat">
+                <span>Hours of work</span>
+                <strong>5.2h</strong>
+              </div>
+              <div class="mini-stat">
+                <span>Income impact</span>
+                <strong>8.4%</strong>
+              </div>
+              <div class="mini-stat">
+                <span>Verdict</span>
+                <strong>Buy</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="floating-note glass-panel floating-note-top">
+            <span class="floating-note-label">Fast answer</span>
+            <strong>Clear verdict in seconds</strong>
+          </div>
+
+          <div class="floating-note glass-panel floating-note-bottom">
+            <span class="floating-note-label">Premium UX</span>
+            <strong>Built like a real startup product</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="tool-section" id="calculator">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">Calculator</div>
+            <h2>The purchase decision cockpit</h2>
+          </div>
+          <p>
+            A clean card-based flow that transforms a simple form into a polished product experience.
+          </p>
+        </div>
+
+        <div class="tool-layout">
+          <section class="glass-panel calculator-card">
+            <div class="card-heading-row">
+              <div>
+                <span class="section-kicker">WorthIt Engine</span>
+                <h3>Analyze a purchase</h3>
+              </div>
+              <span class="status-chip">Beta</span>
+            </div>
+
+            <form id="worthitForm" class="form-grid">
+              <div class="field field-span-2">
+                <label for="productName">Product name</label>
+                <input id="productName" name="productName" type="text" placeholder="Sony WH-1000XM5" required />
+              </div>
+
+              <div class="field">
+                <label for="price">Price (EUR)</label>
+                <input id="price" name="price" type="number" min="0" step="0.01" placeholder="349" required />
+              </div>
+
+              <div class="field">
+                <label for="category">Category</label>
+                <select id="category" name="category">
+                  <option value="electronics">Electronics & Tech</option>
+                  <option value="health">Health & Sport</option>
+                  <option value="education">Education & Books</option>
+                  <option value="home">Home & Living</option>
+                  <option value="transport">Transport & Auto</option>
+                  <option value="utilities">Services & Utilities</option>
+                  <option value="food">Food & Drinks</option>
+                  <option value="groceries">Groceries</option>
+                  <option value="clothing">Clothing & Fashion</option>
+                  <option value="entertainment">Entertainment & Hobby</option>
+                  <option value="travel">Travel</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <div class="field field-span-2">
+                <label for="reason">Why do you want it?</label>
+                <textarea id="reason" name="reason" rows="4" placeholder="Describe the need, use case, or what problem it solves."></textarea>
+              </div>
+
+              <div class="field">
+                <label for="monthlyIncome">Monthly income (EUR)</label>
+                <input id="monthlyIncome" name="monthlyIncome" type="number" min="0" step="0.01" placeholder="2400" />
+              </div>
+
+              <div class="field">
+                <label for="monthlyBudget">Available budget (EUR)</label>
+                <input id="monthlyBudget" name="monthlyBudget" type="number" min="0" step="0.01" placeholder="600" />
+              </div>
+
+              <div class="field">
+                <label for="savings">Savings (EUR)</label>
+                <input id="savings" name="savings" type="number" min="0" step="0.01" placeholder="4200" />
+              </div>
+
+              <div class="field">
+                <label for="hourlyIncome">Hourly income (EUR)</label>
+                <input id="hourlyIncome" name="hourlyIncome" type="number" min="0" step="0.01" placeholder="25" />
+              </div>
+
+              <div class="field">
+                <label for="daysWanted">Days you've wanted it</label>
+                <input id="daysWanted" name="daysWanted" type="number" min="0" step="1" value="3" />
+              </div>
+
+              <div class="field">
+                <label for="mood">Current mood</label>
+                <select id="mood" name="mood">
+                  <option value="neutral">Neutral</option>
+                  <option value="calm">Calm</option>
+                  <option value="stressed">Stressed</option>
+                  <option value="bored">Bored</option>
+                  <option value="excited">Excited</option>
+                  <option value="sad">Sad</option>
+                </select>
+              </div>
+
+              <div class="field field-span-2">
+                <label class="toggle-field">
+                  <input id="hasAlternative" name="hasAlternative" type="checkbox" />
+                  <span>I already have a reasonable alternative</span>
+                </label>
+              </div>
+
+              <div class="slider-stack field-span-2">
+                <div class="slider-card">
+                  <div class="slider-header">
+                    <label for="necessityScore">Necessity</label>
+                    <span id="necessityValue">5</span>
+                  </div>
+                  <input id="necessityScore" name="necessityScore" type="range" min="1" max="10" value="5" />
+                </div>
+
+                <div class="slider-card">
+                  <div class="slider-header">
+                    <label for="urgencyScore">Urgency</label>
+                    <span id="urgencyValue">5</span>
+                  </div>
+                  <input id="urgencyScore" name="urgencyScore" type="range" min="1" max="10" value="5" />
+                </div>
+
+                <div class="slider-card">
+                  <div class="slider-header">
+                    <label for="frequencyScore">Frequency</label>
+                    <span id="frequencyValue">5</span>
+                  </div>
+                  <input id="frequencyScore" name="frequencyScore" type="range" min="1" max="10" value="5" />
+                </div>
+
+                <div class="slider-card">
+                  <div class="slider-header">
+                    <label for="longTermValueScore">Long-term value</label>
+                    <span id="longTermValueValue">5</span>
+                  </div>
+                  <input id="longTermValueScore" name="longTermValueScore" type="range" min="1" max="10" value="5" />
+                </div>
+              </div>
+
+              <div class="form-actions field-span-2">
+                <button class="button button-primary" type="submit">Calculate verdict</button>
+                <button class="button button-secondary" type="reset">Reset</button>
+              </div>
+            </form>
+          </section>
+
+          <aside class="glass-panel result-card" id="resultCard">
+            <div class="card-heading-row">
+              <div>
+                <span class="section-kicker">Live result</span>
+                <h3>Your analysis</h3>
+              </div>
+              <span class="verdict-pill verdict-pill-neutral" id="verdictPill">Awaiting input</span>
+            </div>
+
+            <div class="score-display">
+              <div class="score-ring" id="scoreRing">
+                <div class="score-ring-inner">
+                  <span id="scoreValue">0</span>
+                  <small>Score</small>
+                </div>
+              </div>
+
+              <div class="score-copy">
+                <h4 id="resultHeadline">Waiting for your first analysis</h4>
+                <p id="resultText">
+                  Fill in the product and financial context to get a clear verdict, impact summary, and recommendation.
+                </p>
+              </div>
+            </div>
+
+            <div class="result-metrics">
+              <div class="metric-card">
+                <span>% of income</span>
+                <strong id="incomeImpact">—</strong>
+              </div>
+              <div class="metric-card">
+                <span>% of savings</span>
+                <strong id="savingsImpact">—</strong>
+              </div>
+              <div class="metric-card">
+                <span>Hours of work</span>
+                <strong id="hoursImpact">—</strong>
+              </div>
+              <div class="metric-card">
+                <span>Impulse risk</span>
+                <strong id="impulseRisk">—</strong>
+              </div>
+            </div>
+
+            <div class="insight-panel">
+              <div class="insight-header">
+                <span>Why this verdict?</span>
+                <span id="goalImpactTag">No goal set</span>
+              </div>
+              <p id="explanationText">
+                WorthIt weighs product need, frequency, urgency, affordability, mood context, and opportunity cost.
+              </p>
+            </div>
+
+            <div class="result-actions">
+              <button class="button button-secondary button-full" type="button" id="saveAnalysisBtn">Save analysis</button>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="features-section" id="features">
+        <div class="section-heading compact">
+          <div>
+            <div class="eyebrow">Features</div>
+            <h2>Designed to feel clear, fast, and premium.</h2>
+          </div>
+        </div>
+
+        <div class="feature-grid">
+          <article class="glass-panel feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Fast decision making</h3>
+            <p>
+              Go from uncertainty to action with a structured verdict instead of endless second-guessing.
+            </p>
+          </article>
+
+          <article class="glass-panel feature-card">
+            <div class="feature-icon">⊕</div>
+            <h3>Simple calculations</h3>
+            <p>
+              Financial impact, effort, and urgency are translated into one clean score without overwhelming the user.
+            </p>
+          </article>
+
+          <article class="glass-panel feature-card">
+            <div class="feature-icon">◎</div>
+            <h3>Clear visual results</h3>
+            <p>
+              Large score displays, soft gradients, and concise insights make the output feel instantly understandable.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="about-section" id="about">
+        <div class="glass-panel about-card">
+          <div>
+            <div class="eyebrow">About</div>
+            <h2>A spending decision tool packaged like a premium SaaS product.</h2>
+          </div>
+          <p>
+            WorthIt helps people slow down, think clearly, and buy more intentionally. This redesign turns the project
+            into a modern product page with stronger hierarchy, better spacing, more trust-building visuals, and a
+            polished calculator experience that feels launch-ready.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>© 2026 WorthIt</span>
+      <a href="https://github.com/" target="_blank" rel="noreferrer">View on GitHub</a>
+    </footer>
+  </div>
+
+  <script src="worthit-redesign.js"></script>
+</body>
+</html>
