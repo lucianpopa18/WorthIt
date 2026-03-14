@@ -107,73 +107,109 @@ h1, h2, h3, .brand-name, .card-eyebrow, .result-label, .nav-tab, .ov-lbl {
   z-index: 100;
   display: flex;
   align-items: center;
-  gap: 20px;
+  justify-content: space-between;
   height: var(--nav-h);
-  padding: 0 20px;
+  padding: 0 16px;
   margin: 0 -4px 28px;
-  background: rgba(8,11,18,0.82);
+  background: rgba(8,11,18,0.88);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
   border-radius: 0 0 var(--radius) var(--radius);
 }
 
 [data-theme="light"] .topnav {
-  background: rgba(242,244,251,0.88);
+  background: rgba(242,244,251,0.92);
 }
 
 .nav-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
   font-family: 'Syne', sans-serif;
   font-weight: 800;
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   letter-spacing: -0.02em;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .brand-icon {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   color: var(--accent);
-  filter: drop-shadow(0 0 12px var(--accent-glow));
+  filter: drop-shadow(0 0 10px var(--accent-glow));
 }
 
+/* Tabs — pill group, absolutely centered */
 .nav-tabs {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  gap: 4px;
-  flex: 1;
-  justify-content: center;
+  gap: 2px;
   align-items: center;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px;
+  pointer-events: auto;
+}
+
+[data-theme="light"] .nav-tabs {
+  background: rgba(0,0,0,0.04);
 }
 
 .nav-tab {
   border: none;
   background: transparent;
   color: var(--text-2);
-  font-size: 0.9rem;
+  font-size: 0.86rem;
   font-family: 'Syne', sans-serif;
   font-weight: 600;
-  letter-spacing: 0.02em;
-  padding: 8px 18px;
+  letter-spacing: 0.01em;
+  padding: 7px 16px;
   border-radius: 999px;
   cursor: pointer;
   transition: color var(--transition), background var(--transition);
   white-space: nowrap;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
 }
 
-.nav-tab:hover { color: var(--text); background: var(--surface); }
+.nav-tab:hover { color: var(--text); background: rgba(255,255,255,0.07); }
+
 .nav-tab.active {
   color: var(--text);
-  background: var(--surface-hover);
-  box-shadow: inset 0 0 0 1px var(--border-strong);
+  background: rgba(255,255,255,0.12);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
 }
 
-.nav-tab--settings {
-  margin-left: 8px;
-  border: 1px dashed var(--border-strong);
+[data-theme="light"] .nav-tab.active {
+  background: rgba(0,0,0,0.08);
+}
+
+/* Settings — icon only, right side */
+.nav-settings-icon {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color var(--transition), background var(--transition), transform 0.3s ease;
+}
+
+.nav-settings-icon:hover {
+  color: var(--text);
+  background: rgba(255,255,255,0.1);
+  transform: rotate(60deg);
+}
+
+/* Mobile */
+@media (max-width: 520px) {
+  .brand-name { display: none; }
+  .nav-tab { padding: 7px 11px; font-size: 0.78rem; }
 }
 
 /* ── Tab panels ── */
@@ -1162,9 +1198,7 @@ input[type="range"]::-moz-range-thumb {
 
 @media (max-width: 640px) {
   .app-shell { width: calc(100% - 24px); }
-  .topnav { padding: 0 12px; gap: 10px; }
-  .nav-tabs { gap: 2px; }
-  .nav-tab { padding: 7px 12px; font-size: 0.82rem; }
+  .topnav { padding: 0 12px; }
   .card, .result-card { padding: 20px; }
   .field-row { grid-template-columns: 1fr; }
   .sliders-grid { grid-template-columns: 1fr; }
